@@ -1,1 +1,1 @@
-FusionExport SDK for python applications.
+FusionExport client sdk for python applications

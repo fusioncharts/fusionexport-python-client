@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 from setuptools import setup
 
 with open('README.rst') as readme_file:
@@ -22,8 +23,7 @@ setup(
         'fusionexport',
     ],
     package_dir={
-        'fusionexport':'fusionexport'
+        'fusionexport': 'fusionexport'
     },
     keywords='fusionexport fusioncharts sdk charts export python',
 )
-
