@@ -2,37 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b4d6d6b9-ab05-4fa8-af90-d20683b11c2c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/logo.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/chart-config.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/asyncapture.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/bulk.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/bulk_export.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/callback.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/change_type.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/chart-config-file.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/chart.svg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/convert_svg.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/dashboard.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/dashboard_charts.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/dashboard_logo_head.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/expand_scroll.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/export_a_chart.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/inject_js_as_callback.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/licensed_file.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/output_as_zip.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/scrollchart.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/examples/template.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fusionexport/constants.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fusionexport/export_config.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fusionexport/export_error.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fusionexport/export_manager.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/fusionexport/exporter.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/fusionexport/ExportConfig.py" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.rst" afterPath="$PROJECT_DIR$/README.rst" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/fusionexport/__init__.py" afterPath="$PROJECT_DIR$/fusionexport/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.py" afterPath="$PROJECT_DIR$/index.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -140,8 +110,8 @@
       <file leaf-file-name="setup.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/setup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+            <state relative-caret-position="375">
+              <caret line="25" column="38" lean-forward="true" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -289,13 +259,21 @@
       <option name="project" value="LOCAL" />
       <updated>1511514598763</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Completed implementation of sdk interfaces">
+      <created>1511698305987</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1511698305987</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1680" height="1023" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1827381" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1827381" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32912722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -323,7 +301,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial setup" />
+    <MESSAGE value="Completed implementation of sdk interfaces" />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed implementation of sdk interfaces" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -671,8 +650,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="375">
+          <caret line="25" column="38" lean-forward="true" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
           <folding />
         </state>
       </provider>
