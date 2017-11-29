@@ -28,7 +28,11 @@ export_server_host = "127.0.0.1"
 export_server_port = 1337
 
 export_config = ExportConfig()
-export_config["chartConfig"] = chart_config
+export_config["chartConfig"] = "[]"
+export_config["exportAsZip"] = "True"
+export_config["maxWaitForCaptureExit"] = 42342
+print export_config.get_formatted_configs()
+print export_config.config_values(), export_config.config_names()
 
 em = ExportManager(export_server_host, export_server_port)
 em.export(export_config, on_export_done, on_export_state_changed)

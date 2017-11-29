@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from fusionexport import ExportManager, ExportConfig
+from fusionexport import ExportManager, ExportConfig  # Import sdk
 
 
+# Called when export is done
 def on_export_done(result, error):
     if error:
         print error
@@ -10,15 +11,16 @@ def on_export_done(result, error):
         print result
 
 
+# Called on each export state change
 def on_export_state_changed(state):
     print state
 
 
-export_server_host = "127.0.0.1"
-export_server_port = 1337
-
+# Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
 export_config["inputSVG"] = "fullpath/of/chart.svg"
 
-em = ExportManager(export_server_host, export_server_port)
+# Instantiate the ExportManager class
+em = ExportManager()
+# Call the export() method with the export config and the respective callbacks
 em.export(export_config, on_export_done, on_export_state_changed)

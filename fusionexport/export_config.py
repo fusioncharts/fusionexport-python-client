@@ -66,6 +66,8 @@ class ExportConfig(object):
     def __get_formatted_config_value(self, config_name, config_value):
         if config_name == "chartConfig":
             return config_value
+        elif config_name == "maxWaitForCaptureExit":
+            return str(config_value)
         elif config_name == "asyncCapture":
             return str(config_value).lower()
         elif config_name == "exportAsZip":
