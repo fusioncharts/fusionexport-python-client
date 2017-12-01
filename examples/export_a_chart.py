@@ -8,20 +8,20 @@ def read_file(file_path):
         with open(file_path, "r") as f:
             return f.read()
     except Exception as e:
-        print e
+        print(e)
 
 
 # Called when export is done
 def on_export_done(result, error):
     if error:
-        print error
+        print(error)
     else:
-        print result
+        print(result)
 
 
 # Called on each export state change
 def on_export_state_changed(state):
-    print state
+    print(state)
 
 
 # Instantiate the ExportConfig class and add the required configurations

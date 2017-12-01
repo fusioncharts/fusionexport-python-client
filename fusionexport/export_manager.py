@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from constants import Constants
-from exporter import Exporter
+from .constants import Constants
+from .exporter import Exporter
 
 
 class ExportManager(object):

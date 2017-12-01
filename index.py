@@ -9,30 +9,26 @@ def read_file(file_path):
         with open(file_path, "r") as f:
             return f.read()
     except Exception as e:
-        print e
+        print(e)
 
 
 def on_export_done(result, error):
     if error:
-        print error
+        print(error)
     else:
-        print result
+        print(result)
 
 
 def on_export_state_changed(state):
-    print state
+    print(state)
 
 
-chart_config = read_file("chart-config.json")
+chart_config = read_file("single.json")
 export_server_host = "127.0.0.1"
 export_server_port = 1337
 
 export_config = ExportConfig()
-export_config["chartConfig"] = "[]"
-export_config["exportAsZip"] = "True"
-export_config["maxWaitForCaptureExit"] = 42342
-print export_config.get_formatted_configs()
-print export_config.config_values(), export_config.config_names()
+export_config["chartConfig"] = chart_config
 
 em = ExportManager(export_server_host, export_server_port)
 em.export(export_config, on_export_done, on_export_state_changed)

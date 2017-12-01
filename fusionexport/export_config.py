@@ -58,7 +58,7 @@ class ExportConfig(object):
 
     def get_formatted_configs(self):
         configs_as_json = ""
-        for config_name, config_value in self.__configs.iteritems():
+        for config_name, config_value in self.__configs.items():
             formatted_config_value = self.__get_formatted_config_value(config_name, config_value)
             configs_as_json += "\"%s\": %s, " % (config_name, formatted_config_value)
         return "{ " + configs_as_json[:-2] + " }"

@@ -5,8 +5,8 @@ import re
 import socket
 from threading import Thread
 
-from constants import Constants
-from export_error import ExportError
+from .constants import Constants
+from .export_error import ExportError
 
 
 class Exporter(object):
@@ -55,11 +55,14 @@ class Exporter(object):
         try:
             sock = self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.connect((self.__export_server_host, self.__export_server_port))
-            sock.sendall(self.__get_formatted_export_configs())
+            sock.sendall(self.__get_formatted_export_configs().encode("utf-8"))
 
             data_received = ""
             while 1:
                 read = sock.recv(4096)
+                if (not isinstance(read, str)) and isinstance(read, bytes):
+                    read = read.decode("utf-8")
+
                 if not read: break
                 data_received += read
                 data_received = self.__process_data_received(data_received)
