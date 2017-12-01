@@ -10,10 +10,10 @@ with open('README.rst') as readme_file:
 setup(
     name='fusionexport',
     version='1.0.0-beta',
-    description='Language SDK for FusionExport which enables exporting of charts & dashboards through Python.',
+    description='Python language SDK for FusionExport system',
     long_description=readme,
     author='FusionCharts',
-    author_email='support@fusioncharts.com',
+    author_email='buy@fusioncharts.com',
     url='https://github.com/fusioncharts/fusionexport-python-client',
     license='MIT',
     packages=[

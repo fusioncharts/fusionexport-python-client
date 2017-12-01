@@ -7,7 +7,7 @@ Language SDK for FusionExport which enables exporting of charts & dashboards thr
 Installation
 ------------
 
-To install this Python package, simply use ``pip``:
+To install this Python package, simply use:
 
 .. code-block:: shell
 
@@ -57,8 +57,6 @@ The ``chart-config.json`` file looks as shown below:
 Now, import the ``fusionexport`` module into your project and write export logic as follows:
 
 .. code-block:: python
-
-      #!/usr/bin/env python
 
       from fusionexport import ExportManager, ExportConfig  # Import sdk
 
