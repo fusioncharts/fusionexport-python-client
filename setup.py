@@ -12,12 +12,12 @@ with open('LICENSE') as license_file:
 
 setup(
     name='fusionexport',
-    version='1.0.0',
-    description='FusionExport client sdk for python applications',
+    version='1.0.0-beta',
+    description='Language SDK for FusionExport which enables exporting of charts & dashboards through Python.',
     long_description=readme,
     author='FusionCharts',
     author_email='support@fusioncharts.com',
-    url='https://bitbucket.org/fusioncharts/fusionexport-python-client.git',
+    url='https://github.com/fusioncharts/fusionexport-python-client',
     license=license,
     packages=[
         'fusionexport',
@@ -25,5 +25,5 @@ setup(
     package_dir={
         'fusionexport': 'fusionexport'
     },
-    keywords='fusionexport fusioncharts sdk charts export python',
+    keywords='fusionexport fusioncharts sdk charts export python dashboards language',
 )
