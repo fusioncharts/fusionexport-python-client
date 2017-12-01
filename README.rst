@@ -95,6 +95,6 @@ Now, import the ``fusionexport`` module into your project and write export logic
 Now run this file, then the exported chart will be received on ``ExportDone`` event.
 
 
-`API Reference <https://www.fusioncharts.com/dev/exporting-charts/using-fusionexport/sdk-api-reference/python.html>`_
-----------------------------------------------------------------------------------------------------------------------
-
+API Reference
+-------------
+You can find the full reference `here <https://www.fusioncharts.com/dev/exporting-charts/using-fusionexport/sdk-api-reference/python.html>`_
