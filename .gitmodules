@@ -1,0 +1,3 @@
+[submodule "export-metadata"]
+	path = export-metadata
+	url = https://rousanali@bitbucket.org/snippets/fusioncharts/8eqqgj/fusionexport-sdk-metadata-for-export.git
