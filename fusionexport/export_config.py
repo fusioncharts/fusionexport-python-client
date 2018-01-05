@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
+from .constants import Constants
+from .utils import Utils
+
+
 class ExportConfig(object):
     """Contains export configurations e.g. 'chartConfig', 'inputSVG' etc"""
 
@@ -61,19 +65,29 @@ class ExportConfig(object):
         for config_name, config_value in self.__configs.items():
             formatted_config_value = self.__get_formatted_config_value(config_name, config_value)
             configs_as_json += "\"%s\": %s, " % (config_name, formatted_config_value)
-        return "{ " + configs_as_json[:-2] + " }"
+        configs_as_json += "\"clientName\": %s" % Utils.json_stringify(Constants.CLIENT_NAME)
+        return "{ " + configs_as_json + " }"
 
     def __get_formatted_config_value(self, config_name, config_value):
-        if config_name == "chartConfig":
-            return config_value
-        elif config_name == "maxWaitForCaptureExit":
-            return str(config_value)
-        elif config_name == "asyncCapture":
-            return str(config_value).lower()
-        elif config_name == "exportAsZip":
-            return str(config_value).lower()
-        else:
-            return "\"%s\"" % config_value
+        return {
+            "chartConfig": lambda x: x,
+            "inputSVG": lambda x: Utils.json_stringify(Utils.read_file_in_base64(x)),
+            "templateFilePath": lambda x: Utils.json_stringify(self.__get_zipped_template_in_base64(x)),
+            "callbackFilePath": lambda x: Utils.json_stringify(Utils.read_file_in_base64(x)),
+            "asyncCapture": lambda x: str(x).lower(),
+            "maxWaitForCaptureExit": lambda x: str(x),
+            "dashboardLogo": lambda x: Utils.json_stringify(Utils.read_file_in_base64(x)),
+            "dashboardHeading": lambda x: Utils.json_stringify(x),
+            "dashboardSubheading": lambda x: Utils.json_stringify(x),
+            "outputFileDefinition": lambda x: Utils.json_stringify(Utils.read_file_in_base64(x)),
+            "type": lambda x: Utils.json_stringify(x),
+            "exportFile": lambda x: Utils.json_stringify(x),
+            "exportAsZip": lambda x: str(x).lower()
+        }.get(config_name, lambda x: Utils.json_stringify(x))(config_value)
+
+    def __get_zipped_template_in_base64(self, template_path):
+
+        pass
 
     def __str__(self):
         return self.get_formatted_configs()
