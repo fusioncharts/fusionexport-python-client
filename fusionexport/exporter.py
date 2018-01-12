@@ -85,7 +85,7 @@ class Exporter(object):
         state = data[len(Constants.EXPORT_EVENT):]
         state = Utils.json_parse(state)
         if state is not None and "error" not in state:
-            self.__on_export_sate_changed(state)
+            self.__on_export_sate_changed({"state": state})
         else:
             err_msg = "Unexpected error occurred" if state is None else state["error"]
             self.__on_export_done(None, ExportError(err_msg))
@@ -96,7 +96,7 @@ class Exporter(object):
         if export_result is None:
             self.__on_export_done(None, ExportError("Unexpected error occurred"))
         else:
-            self.__on_export_done(export_result, None)
+            self.__on_export_done({"result": export_result}, None)
 
     def __on_export_sate_changed(self, state):
         if self.__export_state_changed_listener is not None:

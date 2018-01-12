@@ -11,3 +11,5 @@ class Constants(object):
         "meta": "../export-metadata/fusionexport-meta.json",
         "typings": "../export-metadata/fusionexport-typings.json"
     }
+    EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH = "templateFilePath"
+    EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH = "resourceFilePath"

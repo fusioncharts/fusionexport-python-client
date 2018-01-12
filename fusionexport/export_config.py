@@ -41,10 +41,7 @@ class ExportConfig(object):
             else:
                 raise ExportError("Unknown converter for the specified config name")
         elif metadata["typings"][config_name]["type"] == "string":
-            if isinstance(config_value, str):
-                return config_value
-            else:
-                raise ExportError("Export config '%s' must be string value" % config_name)
+            return str(config_value)
         else:
             raise ExportError("Could not resolved the config name and config value")
 
@@ -87,13 +84,22 @@ class ExportConfig(object):
 
     def get_formatted_configs(self):
         configs = self.__configs.copy()
+        ec_template = Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH
+        ec_resource = Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH
         configs_as_json = ""
 
-        if "templateFilePath" in configs and "resourceFilePath" not in configs:
-            configs["resourceFilePath"] = None
+        if ec_template in configs:
+            template_path = configs[ec_template]
+            resource_path = configs[ec_resource] = configs.get(ec_resource, None)
 
-        if "templateFilePath" not in configs and "resourceFilePath" in configs:
-            del configs["resourceFilePath"]
+            zipped_content = Utils.get_zipped_template_in_base64(template_path, resource_path)
+            configs_as_json += "\"%s\": %s, " % (ec_template, Utils.json_stringify(zipped_content[0]))
+            configs_as_json += "\"%s\": %s, " % (ec_resource, Utils.json_stringify(zipped_content[1]))
+
+            del configs[ec_template]
+            del configs[ec_resource]
+        elif ec_resource in configs:
+            del configs[ec_resource]
 
         for config_name, config_value in configs.items():
             formatted_config_value = self.__get_formatted_config_value(config_name, config_value)
@@ -103,18 +109,12 @@ class ExportConfig(object):
         return "{ " + configs_as_json + " }"
 
     def __get_formatted_config_value(self, config_name, config_value):
-        if config_name == "resourceFilePath":
-            return Utils.json_stringify(
-                self.__get_zipped_template_in_base64(self.__configs["templateFilePath"], config_value))
-
         metadata = self.__export_metadata
+
         if config_name in metadata["meta"] and "isBase64Required" in metadata["meta"][config_name]:
             return Utils.json_stringify(Utils.read_file_in_base64(config_value))
         else:
             return Utils.json_stringify(config_value)
-
-    def __get_zipped_template_in_base64(self, template_file_path, resource_file_path):
-        pass
 
     def __str__(self):
         return str(self.__configs)

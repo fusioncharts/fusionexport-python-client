@@ -1,0 +1,8 @@
+{
+  "include": [
+    "*.json", "a/**/*"
+  ],
+  "exclude": [
+    "random2.json", "**/*.data"
+  ]
+}
