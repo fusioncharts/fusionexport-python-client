@@ -1,0 +1,16 @@
+{
+  "chart-config": "chart_config.js",
+  "output-file": "../../climatechange",
+  "output-as-zip": false,
+  "template": "template.html",
+  "resources": {
+    "stylesheets": [
+      "style.css"
+    ]
+  },
+  "type": "jpeg",
+  "log-dest": "uat/",
+  "log-file": "test.log",
+  "log-level": "silly",
+  "remote-export-enabled": false
+}
