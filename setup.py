@@ -19,8 +19,11 @@ setup(
     packages=[
         'fusionexport',
     ],
+    install_requires=[
+        'ws4py', 'glob2', 'beautifulsoup4'
+    ],
     package_dir={
         'fusionexport': 'fusionexport'
     },
-    keywords='fusionexport fusioncharts sdk charts export python dashboards language',
+    keywords='fusionexport fusioncharts sdk charts export python dashboards language client',
 )

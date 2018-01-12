@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-import re
-import socket
 from threading import Thread
 
 from .constants import Constants
 from .export_error import ExportError
+from .export_websocket import ExportWebSocket
+from .utils import Utils
 
 
 class Exporter(object):
@@ -18,7 +18,7 @@ class Exporter(object):
         self.__export_state_changed_listener = export_state_changed_listener
         self.__export_server_host = Constants.DEFAULT_HOST
         self.__export_server_port = Constants.DEFAULT_PORT
-        self.__socket = None
+        self.__websocket_client = None
         self.__socket_connection_thread = None
 
     def set_export_connection_config(self, host, port):
@@ -45,71 +45,65 @@ class Exporter(object):
         self.__socket_connection_thread.start()
 
     def cancel(self):
-        if self.__socket is not None:
-            try:
-                self.__socket.close()
-            except Exception as e:
-                pass
+        self.__close_websocket_conn()
 
     def __handle_socket_connection(self):
         try:
-            sock = self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.connect((self.__export_server_host, self.__export_server_port))
-            sock.sendall(self.__get_formatted_export_configs().encode("utf-8"))
-
-            data_received = ""
-            while 1:
-                read = sock.recv(4096)
-                if (not isinstance(read, str)) and isinstance(read, bytes):
-                    read = read.decode("utf-8")
-
-                if not read: break
-                data_received += read
-                data_received = self.__process_data_received(data_received)
+            ws = self.__websocket_client = ExportWebSocket(self.__export_server_host,
+                                                           self.__export_server_port,
+                                                           self.__on_websocket_conn_opened,
+                                                           self.__on_websocket_conn_closed,
+                                                           self.__on_websocket_message_received)
+            ws.connect()
+            ws.run_forever()
         except Exception as e:
             self.__on_export_done(None, ExportError(str(e)))
-        finally:
-            if self.__socket is not None:
-                try:
-                    self.__socket.close()
-                except Exception as e:
-                    pass
+
+    def __on_websocket_conn_opened(self):
+        self.__websocket_client.send(self.__get_formatted_export_configs())
+
+    def __on_websocket_conn_closed(self, code, reason=None):
+        pass
+
+    def __on_websocket_message_received(self, message):
+        self.__process_data_received(str(message))
+
+    def __close_websocket_conn(self):
+        if self.__websocket_client is not None:
+            try:
+                self.__websocket_client.close()
+            except Exception as e:
+                pass
 
     def __process_data_received(self, data):
-        parts = data.split(Constants.UNIQUE_BORDER, -1)
-        for i in range(len(parts) - 1):
-            part = parts[i]
-            if part.startswith(Constants.EXPORT_EVENT):
-                self.__process_export_state_changed_data(part)
-            elif part.startswith(Constants.EXPORT_DATA):
-                self.__process_export_done_data(part)
-        return parts[len(parts) - 1]
+        if data.startswith(Constants.EXPORT_EVENT):
+            self.__process_export_state_changed_data(data)
+        elif data.startswith(Constants.EXPORT_DATA):
+            self.__process_export_done_data(data)
 
     def __process_export_state_changed_data(self, data):
         state = data[len(Constants.EXPORT_EVENT):]
-        export_error = self.__check_export_error(state)
-        if export_error is None:
-            self.__on_export_sate_changed(state)
+        state = Utils.json_parse(state)
+        if state is not None and "error" not in state:
+            self.__on_export_sate_changed({"state": state})
         else:
-            self.__on_export_done(None, ExportError(export_error))
-
-    def __check_export_error(self, state):
-        error_pattern = "^\\s*\\{\\s*\"error\"\\s*:\\s*\"(.+)\"\\s*}\\s*$"
-        found = re.match(error_pattern, state, re.S)
-        if found is not None:
-            return found.group(1)
-        else:
-            return None
+            err_msg = "Unexpected error occurred" if state is None else state["error"]
+            self.__on_export_done(None, ExportError(err_msg))
 
     def __process_export_done_data(self, data):
         export_result = data[len(Constants.EXPORT_DATA):]
-        self.__on_export_done(export_result, None)
+        export_result = Utils.json_parse(export_result)
+        if export_result is None:
+            self.__on_export_done(None, ExportError("Unexpected error occurred"))
+        else:
+            self.__on_export_done({"result": export_result}, None)
 
     def __on_export_sate_changed(self, state):
         if self.__export_state_changed_listener is not None:
             self.__export_state_changed_listener(state)
 
     def __on_export_done(self, result, error):
+        self.__close_websocket_conn()
         if self.__export_done_listener is not None:
             self.__export_done_listener(result, error)
 
