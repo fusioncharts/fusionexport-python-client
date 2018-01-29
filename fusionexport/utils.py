@@ -30,6 +30,17 @@ class Utils(object):
             return f.read()
 
     @staticmethod
+    def write_binary_data(file_path, data):
+        file_path = os.path.abspath(file_path)
+        dir_path = os.path.dirname(file_path)
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        with open(file_path, "wb") as f:
+            f.write(data)
+
+    @staticmethod
     def read_text_file(file_path):
         with open(file_path, "r") as f:
             return f.read()

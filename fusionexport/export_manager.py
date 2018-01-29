@@ -6,6 +6,7 @@ import base64
 
 from .constants import Constants
 from .exporter import Exporter
+from .utils import Utils
 
 
 class ExportManager(object):
@@ -42,11 +43,10 @@ class ExportManager(object):
 
     @staticmethod
     def save_exported_files(dir_path, exported_output):
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
+        dir_path = os.path.abspath(dir_path)
         for exported_data in exported_output["data"]:
-            with open(os.path.join(dir_path, exported_data["realName"]), "wb") as f:
-                f.write(base64.b64decode(exported_data["fileContent"]))
+            Utils.write_binary_data(os.path.join(dir_path, exported_data["realName"]),
+                                    base64.b64decode(exported_data["fileContent"]))
 
     @staticmethod
     def get_exported_file_names(exported_output):

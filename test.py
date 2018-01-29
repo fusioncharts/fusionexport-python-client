@@ -16,27 +16,27 @@ def on_export_done(event, error):
     if error:
         print(error)
     else:
-        ExportManager.save_exported_files("./exported_images", event["result"])
+        ExportManager.save_exported_files("exported_images", event["result"])
 
 
 def on_export_state_changed(event):
     print(event["state"])
 
 
-chart_config = read_file("./template-test/dashboard/chart-config.json")
-export_server_host = "127.0.0.1"
-export_server_port = 1337
+chart_config = read_file("./template-test/single.json")
+export_server_host = "35.227.83.76"
+export_server_port = 8080
 
 export_config = ExportConfig()
 export_config["chartConfig"] = chart_config
-# export_config["exportAsZip"] = True
-# export_config["inputSVG"] = "./template-test/sample.svg"
-# export_config["type"] = "xsls"
-export_config["templateFilePath"] = "./template-test/dashboard/template.html"
-export_config["resourceFilePath"] = "./template-test/dashboard/resources.json"
-export_config["dashboardLogo"] = "/Users/rousan/Projects/fusionexport-python-client/template-test/dashboard/angular-smgkcu.zip"
-export_config["dashboardHeading"] = "AI is best"
-export_config["dashboardSubheading"] = "A sdf sfsd"
+# export_config["exportAsZip"] = False
+# # export_config["inputSVG"] = "./template-test/sample.svg"
+# export_config["type"] = "pdf"
+# export_config["templateFilePath"] = "./template-test/dashboard/template.html"
+# export_config["resourceFilePath"] = "./template-test/dashboard/resources.json"
+# export_config["dashboardLogo"] = "/Users/rousan/Projects/fusionexport-python-client/template-test/dashboard/angular-smgkcu.zip"
+# export_config["dashboardHeading"] = "AI is best"
+# export_config["dashboardSubheading"] = "A sdf sfsd"
 # export_config["callbackFilePath"] = "./template-test/callback.js"
 
 em = ExportManager(export_server_host, export_server_port)
