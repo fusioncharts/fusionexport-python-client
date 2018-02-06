@@ -105,7 +105,8 @@ class ExportConfig(object):
             formatted_config_value = self.__get_formatted_config_value(config_name, config_value)
             configs_as_json += "\"%s\": %s, " % (config_name, formatted_config_value)
 
-        configs_as_json += "\"clientName\": %s" % Utils.json_stringify(Constants.CLIENT_NAME)
+        configs_as_json += "\"clientName\": %s, " % Utils.json_stringify(Constants.CLIENT_NAME)
+        configs_as_json += "\"platform\": %s" % Utils.json_stringify(Utils.system_platform())
         return "{ " + configs_as_json + " }"
 
     def __get_formatted_config_value(self, config_name, config_value):

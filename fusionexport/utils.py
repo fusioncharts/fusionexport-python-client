@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import sys
 import base64
 import json
 import os
@@ -207,3 +208,7 @@ class Utils(object):
             if value.startswith(prefix):
                 return True
         return False
+
+    @staticmethod
+    def system_platform():
+        return str(sys.platform).lower()
