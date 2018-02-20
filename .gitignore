@@ -91,7 +91,8 @@ ENV/
 
 .DS_Store
 
-/.idea/
+.idea/*
 .idea/workspace.xml
 
 exported_images/
+examples/exported_images/
