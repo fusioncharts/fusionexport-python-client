@@ -24,11 +24,12 @@ def on_export_state_changed(event):
 
 
 chart_config = read_file("./template-test/single.json")
-export_server_host = "127.0.0.1"
+export_server_host = "192.168.0.189"
 export_server_port = 1337
 
 export_config = ExportConfig()
-export_config["chartConfig"] = '[]'
+export_config["chartConfig"] = chart_config
+export_config["quality"] = "good"
 # export_config["exportAsZip"] = False
 # # export_config["inputSVG"] = "./template-test/sample.svg"
 # export_config["type"] = "pdf"
@@ -38,8 +39,6 @@ export_config["chartConfig"] = '[]'
 # export_config["dashboardHeading"] = "AI is best"
 # export_config["dashboardSubheading"] = "A sdf sfsd"
 # export_config["callbackFilePath"] = "./template-test/callback.js"
-
-print(export_config.get_formatted_configs())
 
 em = ExportManager(export_server_host, export_server_port)
 em.export(export_config, on_export_done, on_export_state_changed)
