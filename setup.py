@@ -9,11 +9,11 @@ with open('README.rst') as readme_file:
 
 setup(
     name='fusionexport',
-    version='1.0.0-beta',
+    version='1.0.0-rc',
     description='Python language SDK for FusionExport',
     long_description=readme,
     author='FusionCharts',
-    author_email='support@fusioncharts.com',
+    author_email='fusionexport@fusioncharts.com',
     url='https://github.com/fusioncharts/fusionexport-python-client',
     license='MIT',
     packages=[
