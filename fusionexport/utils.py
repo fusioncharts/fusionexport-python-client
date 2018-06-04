@@ -197,11 +197,10 @@ class Utils(object):
         return matched_paths
 
     @staticmethod
-    def resolve_url_to_path(relative_url, root_path):
-        return os.path.abspath(os.path.join(root_path, relative_url))
-
-    @staticmethod
     def is_url(value):
+        if value is None:
+            return True
+
         value = str(value)
         prefixes = ["//", "http://", "https://", "file://"]
         for prefix in prefixes:
@@ -212,3 +211,8 @@ class Utils(object):
     @staticmethod
     def system_platform():
         return str(sys.platform).lower()
+
+    @staticmethod
+    def resolve_url_to_path(relative_url, root_path):
+        if not relative_url:
+            return os.path.abspath(os.path.join(root_path, relative_url))
