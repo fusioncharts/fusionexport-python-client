@@ -90,4 +90,9 @@ ENV/
 .ropeproject
 
 .DS_Store
-workspace.xml
+
+.idea/*
+.idea/workspace.xml
+
+exported_images/
+examples/exported_images/

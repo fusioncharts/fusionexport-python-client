@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
+import os
+import base64
+
 from .constants import Constants
 from .exporter import Exporter
+from .utils import Utils
 
 
 class ExportManager(object):
@@ -36,3 +40,14 @@ class ExportManager(object):
         exporter.set_export_connection_config(self.__host, self.__port)
         exporter.start()
         return exporter
+
+    @staticmethod
+    def save_exported_files(dir_path, exported_output):
+        dir_path = os.path.abspath(dir_path)
+        for exported_data in exported_output["data"]:
+            Utils.write_binary_data(os.path.join(dir_path, exported_data["realName"]),
+                                    base64.b64decode(exported_data["fileContent"]))
+
+    @staticmethod
+    def get_exported_file_names(exported_output):
+        return [x["realName"] for x in exported_output["data"]]

@@ -26,9 +26,8 @@ def on_export_state_changed(event):
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["chartConfig"] = read_file("scrollchart.json")
-export_config["callbackFilePath"] = "expand_scroll.js"
-export_config["asyncCapture"] = True
+export_config["chartConfig"] = read_file("chart-config-file.json")
+export_config["quality"] = "best"
 
 # Provide port and host of FusionExport Service
 export_server_host = "127.0.0.1"

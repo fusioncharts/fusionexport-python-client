@@ -9,18 +9,21 @@ with open('README.rst') as readme_file:
 
 setup(
     name='fusionexport',
-    version='1.0.0-beta',
-    description='Python language SDK for FusionExport system',
+    version='1.0.0-rc',
+    description='Python language SDK for FusionExport',
     long_description=readme,
     author='FusionCharts',
-    author_email='buy@fusioncharts.com',
+    author_email='fusionexport@fusioncharts.com',
     url='https://github.com/fusioncharts/fusionexport-python-client',
     license='MIT',
     packages=[
         'fusionexport',
     ],
+    install_requires=[
+        'ws4py', 'glob2', 'beautifulsoup4'
+    ],
     package_dir={
         'fusionexport': 'fusionexport'
     },
-    keywords='fusionexport fusioncharts sdk charts export python dashboards language',
+    keywords='fusionexport fusioncharts sdk charts export python dashboards language client',
 )
