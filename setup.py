@@ -20,7 +20,7 @@ setup(
         'fusionexport',
     ],
     install_requires=[
-		'ws4py', 'glob2', 'beautifulsoup4', 'boto3'
+		'requests', 'glob2', 'beautifulsoup4'
     ],
     package_dir={
         'fusionexport': 'fusionexport'

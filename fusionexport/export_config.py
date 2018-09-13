@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
-
+import os
 
 from .constants import Constants
 from .utils import Utils
 from .export_error import ExportError
+from .typings import typings
 from .converters import BooleanConverter, NumberConverter
 
-
 class ExportConfig(object):
-    """Contains export configurations according to the export metadata"""
-
     def __init__(self, config_dict=None):
-        self.__export_metadata = Utils.get_export_metadata()
         self.__configs = {}
 
         if config_dict is not None:
@@ -28,22 +24,21 @@ class ExportConfig(object):
         self.__configs[config_name] = self.__resolve_config_value(config_name, config_value)
 
     def __resolve_config_value(self, config_name, config_value):
-        metadata = self.__export_metadata
+        if config_name not in typings:
+            raise ExportError("Invalid export config: %s" % config_name)
 
-        if config_name not in metadata["typings"]:
-            raise ExportError("Export config '%s' is not supported" % config_name)
-
-        if "converter" in metadata["typings"][config_name]:
-            if metadata["typings"][config_name]["converter"] == "BooleanConverter":
+        converter = typings[config_name].get("converter", None)
+        if converter is not None:
+            if converter == "BooleanConverter":
                 return BooleanConverter.convert(config_value)
-            elif metadata["typings"][config_name]["converter"] == "NumberConverter":
+            elif converter == "NumberConverter":
                 return NumberConverter.convert(config_value)
             else:
-                raise ExportError("Unknown converter for the specified config name")
-        elif metadata["typings"][config_name]["type"] == "string":
+                raise ExportError("Unknown converter: %s" % converter)
+        elif typings[config_name]["type"] == "string":
             return str(config_value)
         else:
-            raise ExportError("Could not resolved the config name and config value")
+            raise ExportError("Could not resolve the config name and config value")
 
     def get(self, config_name):
         return self.__configs[config_name]
@@ -83,39 +78,76 @@ class ExportConfig(object):
         return ExportConfig(self.__configs)
 
     def get_formatted_configs(self):
+        configs = self.__process_config_values()
+        configs.pop(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
+        return configs
+
+    def __process_config_values(self):
         configs = self.__configs.copy()
-        ec_template = Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH
-        ec_resource = Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH
-        configs_as_json = ""
+        zip_files_map = []
 
-        if ec_template in configs:
-            template_path = configs[ec_template]
-            resource_path = configs[ec_resource] = configs.get(ec_resource, None)
+        if Constants.EXPORT_CONFIG_NAME_CHARTCONFIG in configs:
+            chart_config_val = configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG]
+            if chart_config_val.endsWith(".json"):
+                configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG] = Utils.read_text_file(chart_config_val)
+        
+        if Constants.EXPORT_CONFIG_NAME_INPUTSVG in configs:
+            self.__resolve_zip_path_config(
+                configs,
+                zip_files_map,
+                Constants.EXPORT_CONFIG_NAME_INPUTSVG,
+                Constants.EXPORT_CONFIG_ZIP_PATH_INPUTSVG
+            )
 
-            zipped_content = Utils.get_zipped_template_in_base64(template_path, resource_path)
-            configs_as_json += "\"%s\": %s, " % (ec_template, Utils.json_stringify(zipped_content[0]))
-            configs_as_json += "\"%s\": %s, " % (ec_resource, Utils.json_stringify(zipped_content[1]))
+        if Constants.EXPORT_CONFIG_NAME_CALLBACK_FILE_PATH in configs:
+            self.__resolve_zip_path_config(
+                configs,
+                zip_files_map,
+                Constants.EXPORT_CONFIG_NAME_CALLBACK_FILE_PATH,
+                Constants.EXPORT_CONFIG_ZIP_PATH_CALLBACK_FILE_PATH
+            )
+        
+        if Constants.EXPORT_CONFIG_NAME_DASHBOARD_LOGO in configs:
+            ext = os.path.splitext(configs[Constants.EXPORT_CONFIG_NAME_DASHBOARD_LOGO])[1]
+            self.__resolve_zip_path_config(
+                configs,
+                zip_files_map,
+                Constants.EXPORT_CONFIG_NAME_DASHBOARD_LOGO,
+                Constants.EXPORT_CONFIG_ZIP_PATH_DASHBOARD_LOGO + ext
+            )
 
-            del configs[ec_template]
-            del configs[ec_resource]
-        elif ec_resource in configs:
-            del configs[ec_resource]
+        if Constants.EXPORT_CONFIG_NAME_OUTPUT_FILE_DEFINITION in configs:
+            self.__resolve_zip_path_config(
+                configs,
+                zip_files_map,
+                Constants.EXPORT_CONFIG_NAME_OUTPUT_FILE_DEFINITION,
+                Constants.EXPORT_CONFIG_ZIP_PATH_OUTPUT_FILE_DEFINITION
+            )
 
-        for config_name, config_value in configs.items():
-            formatted_config_value = self.__get_formatted_config_value(config_name, config_value)
-            configs_as_json += "\"%s\": %s, " % (config_name, formatted_config_value)
+        if Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH:
+            template_zip_files_map, prefixed_template_zip_path = Utils.create_template_zip_paths(
+                configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH],
+                configs.get(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
+            )
+            configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH] = prefixed_template_zip_path
+            zip_files_map.extend(template_zip_files_map)
 
-        configs_as_json += "\"clientName\": %s, " % Utils.json_stringify(Constants.CLIENT_NAME)
-        configs_as_json += "\"platform\": %s" % Utils.json_stringify(Utils.system_platform())
-        return "{ " + configs_as_json + " }"
+        if Constants.EXPORT_CONFIG_NAME_ASYNC_CAPTURE in configs:
+            bool_val = configs[Constants.EXPORT_CONFIG_NAME_ASYNC_CAPTURE]
+            configs[Constants.EXPORT_CONFIG_NAME_ASYNC_CAPTURE] = str(bool_val).lower()
 
-    def __get_formatted_config_value(self, config_name, config_value):
-        metadata = self.__export_metadata
+        if len(zip_files_map) > 0:
+            zip_file_path = Utils.generate_zip_file(zip_files_map)
+            configs[Constants.EXPORT_CONFIG_NAME_PAYLOAD] = zip_file_path
+        
+        return configs
 
-        if config_name in metadata["meta"] and "isBase64Required" in metadata["meta"][config_name]:
-            return Utils.json_stringify(Utils.read_file_in_base64(config_value))
-        else:
-            return Utils.json_stringify(config_value)
+    def __resolve_zip_path_config(self, configs, zip_files_map, config_name, zip_path):
+        zip_files_map.append({
+            "zipPath": zip_path,
+            "localPath": configs[config_name]
+        })
+        configs[config_name] = zip_path
 
     def __str__(self):
         return str(self.__configs)
