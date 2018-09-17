@@ -60,16 +60,9 @@ Now, import the ``fusionexport`` module into your project and write export logic
 
       from fusionexport import ExportManager, ExportConfig  # Import sdk
 
-      def read_file(file_path):
-          try:
-              with open(file_path, "r") as f:
-                  return f.read()
-          except Exception as e:
-              print(e)
-
       # Instantiate the ExportConfig class and add the required configurations
       export_config = ExportConfig()
-      export_config["chartConfig"] = read_file("chart-config.json")
+      export_config["chartConfig"] = "./chart-config.json"
 
       # Provide port and host of FusionExport Service
       export_server_host = "127.0.0.1"
@@ -77,7 +70,7 @@ Now, import the ``fusionexport`` module into your project and write export logic
 
       # Instantiate the ExportManager class
       em = ExportManager(export_server_host, export_server_port)
-      # Call the export() method with the export config and output location
+      # Call the export() method with the export config and the output location
       exported_files = em.export(export_config, "./exported-charts")
       print(exported_files)
 
