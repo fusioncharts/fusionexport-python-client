@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import sys
 import base64
 import json
@@ -11,47 +8,13 @@ import shutil
 from bs4 import BeautifulSoup
 
 from .constants import Constants
-
+from .export_error import ExportError
 
 class Utils(object):
-    """Contains utility methods"""
-
-    __export_metadata = None
-
-    @staticmethod
-    def read_file_in_base64(file_path):
-        base64_content = base64.b64encode(Utils.read_binary_file(file_path))
-        if (not isinstance(base64_content, str)) and isinstance(base64_content, bytes):
-            base64_content = base64_content.decode("utf-8")
-        return base64_content
-
-    @staticmethod
-    def read_binary_file(file_path):
-        with open(file_path, "rb") as f:
-            return f.read()
-
-    @staticmethod
-    def write_binary_data(file_path, data):
-        file_path = os.path.abspath(file_path)
-        dir_path = os.path.dirname(file_path)
-
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-
-        with open(file_path, "wb") as f:
-            f.write(data)
-
     @staticmethod
     def read_text_file(file_path):
         with open(file_path, "r") as f:
             return f.read()
-
-    @staticmethod
-    def json_stringify(value):
-        try:
-            return json.dumps(value)
-        except Exception:
-            return None
 
     @staticmethod
     def json_parse(value):
@@ -61,61 +24,63 @@ class Utils(object):
             return None
 
     @staticmethod
-    def get_export_metadata_file_path():
-        return {
-            "meta": os.path.abspath(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), Constants.EXPORT_METADATA_FILES["meta"])),
-            "typings": os.path.abspath(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), Constants.EXPORT_METADATA_FILES["typings"]))
-        }
-
-    @staticmethod
-    def get_export_metadata():
-        metadata_file_path = Utils.get_export_metadata_file_path()
-        if Utils.__export_metadata is None:
-            Utils.__export_metadata = {
-                "meta": Utils.json_parse(Utils.read_text_file(metadata_file_path["meta"])),
-                "typings": Utils.json_parse(Utils.read_text_file(metadata_file_path["typings"]))
-            }
-        return Utils.__export_metadata
-
-    @staticmethod
-    def get_zipped_template_in_base64(template_file_path, resource_file_path):
+    def create_template_zip_paths(template_file_path, resource_file_path):
         template_file_path = os.path.abspath(template_file_path)
-        template_file_refs = Utils.__extract_ref_files_from_template(template_file_path)
-        base_path, resource_file_paths = Utils.__normalize_resource_file_paths(resource_file_path)
 
-        all_paths = [template_file_path] + template_file_refs + resource_file_paths
-
+        ref_files = Utils.extract_ref_files_from_template(template_file_path)
+        base_path, res_paths = Utils.normalize_resource_file_paths(resource_file_path)
         if base_path is None:
-            base_path = Utils.get_common_path(all_paths)
+            base_path = Utils.get_common_path([template_file_path] + ref_files)
+        
+        if base_path == "":
+            raise ExportError("Couldn't calculate the basepath of template resources")
+        
+        res_paths = list(filter(lambda path: Utils.is_within_path(path, base_path), res_paths))
 
+        zip_files_map = Utils.create_template_zip_files_map(
+            ref_files + res_paths + [template_file_path],
+            base_path
+        )
+
+        prefixed_template_file_zip_path = os.path.join(
+            Constants.TEMPLATE_ZIP_PREFIX,
+            Utils.get_rel_path_within_root(template_file_path, base_path)
+        )
+
+        return zip_files_map, prefixed_template_file_zip_path
+    
+    @staticmethod
+    def create_template_zip_files_map(paths, base_path):
+        return list(map(
+            lambda path: { "zipPath": Utils.create_prefixed_template_zip_path(path, base_path), "localPath": path },
+            paths
+        ))
+    
+    @staticmethod
+    def create_prefixed_template_zip_path(local_path, base_path):
+        rel_path = Utils.get_rel_path_within_root(local_path, base_path)
+        return os.path.join(Constants.TEMPLATE_ZIP_PREFIX, rel_path)
+    
+    @staticmethod
+    def generate_zip_file(zip_files_map):
         temp_dir = tempfile.mkdtemp()
-        temp_write_dir = os.path.abspath(os.path.join(temp_dir, "fusioncharts"))
+        temp_write_dir = os.path.abspath(os.path.join(temp_dir, "files"))
         os.makedirs(temp_write_dir)
 
-        for path in all_paths:
-            rel_path = Utils.get_rel_path_within_root(path, base_path)
+        for path_map in zip_files_map:
+            rel_path = path_map["zipPath"]
             if rel_path is not None:
+                rel_path = rel_path.strip(os.sep)
                 temp_output_file_path = os.path.abspath(os.path.join(temp_write_dir, rel_path))
                 if not os.path.exists(os.path.dirname(temp_output_file_path)):
                     os.makedirs(os.path.dirname(temp_output_file_path))
-                shutil.copyfile(path, temp_output_file_path)
+                shutil.copyfile(path_map["localPath"], temp_output_file_path)
 
-        template_rel_path_within_zip = Utils.get_rel_path_within_root(template_file_path, base_path)
-        if template_rel_path_within_zip is None:
-            template_rel_path_within_zip = os.path.basename(template_file_path)
-
-        temp_template_output_file_path = os.path.abspath(os.path.join(temp_write_dir, template_rel_path_within_zip))
-        if not os.path.exists(temp_template_output_file_path):
-            shutil.copyfile(template_file_path, temp_template_output_file_path)
-
-        shutil.make_archive(os.path.abspath(os.path.join(temp_dir, "fusioncharts")), 'zip', temp_write_dir)
-
-        base64_zip = Utils.read_file_in_base64(os.path.abspath(os.path.join(temp_dir, "fusioncharts.zip")))
-        shutil.rmtree(temp_dir)
-
-        return template_rel_path_within_zip, base64_zip
+        return shutil.make_archive(os.path.abspath(os.path.join(temp_dir, "archive")), 'zip', temp_write_dir)
+    
+    @staticmethod
+    def is_within_path(target_path, parent_path):
+        return target_path.startswith(parent_path + os.sep)
 
     @staticmethod
     def get_rel_path_within_root(path, root_path):
@@ -128,7 +93,7 @@ class Utils(object):
         return os.path.abspath(os.path.dirname(os.path.commonprefix(paths)))
 
     @staticmethod
-    def __extract_ref_files_from_template(template_file_path):
+    def extract_ref_files_from_template(template_file_path):
         if template_file_path is None:
             return []
 
@@ -139,31 +104,36 @@ class Utils(object):
         html_soup = BeautifulSoup(html_template, 'html.parser')
 
         for link in html_soup.find_all('link'):
-            ref = Utils.__resolve_template_ref(link.get("href"), template_file_dir)
+            ref = Utils.resolve_template_ref(link.get("href"), template_file_dir)
             if ref is not None:
                 ref_files.append(ref)
 
         for script in html_soup.find_all('script'):
-            ref = Utils.__resolve_template_ref(script.get("src"), template_file_dir)
+            ref = Utils.resolve_template_ref(script.get("src"), template_file_dir)
             if ref is not None:
                 ref_files.append(ref)
 
         for img in html_soup.find_all('img'):
-            ref = Utils.__resolve_template_ref(img.get("src"), template_file_dir)
+            ref = Utils.resolve_template_ref(img.get("src"), template_file_dir)
             if ref is not None:
                 ref_files.append(ref)
 
         return ref_files
 
     @staticmethod
-    def __normalize_resource_file_paths(resource_file_path):
+    def normalize_resource_file_paths(resource_file_path):
         if resource_file_path is None:
             return None, []
 
         resource_file_path = os.path.abspath(resource_file_path)
         resource_file_dir = os.path.dirname(resource_file_path)
+
         rc_config = Utils.json_parse(Utils.read_text_file(resource_file_path))
-        base_path = rc_config.get("basePath", None)  # Resolve base_path wrt resource_file_dir not cwd
+        if rc_config is None:
+            raise ExportError("Failed to parse the resource JSON file")
+
+        base_path = rc_config.get("basePath", None)
+        # Resolve base_path wrt resource_file_dir not cwd
         base_path = os.path.abspath(os.path.join(resource_file_dir, base_path)) if base_path is not None else None
 
         include_paths = Utils.glob_matched_paths(rc_config.get("include", None), resource_file_dir)
@@ -172,9 +142,12 @@ class Utils(object):
         return base_path, list(set(include_paths).difference(set(exclude_paths)))
 
     @staticmethod
-    def __resolve_template_ref(ref, template_file_dir):
+    def resolve_template_ref(ref, template_file_dir):
+        if ref is None or ref == "":
+            return None
+
         if not Utils.is_url(ref):
-            return Utils.resolve_url_to_path(ref, template_file_dir)
+            return os.path.abspath(os.path.join(template_file_dir, ref))
 
     @staticmethod
     def glob_matched_paths(glob_pats, root_path):
@@ -198,21 +171,9 @@ class Utils(object):
 
     @staticmethod
     def is_url(value):
-        if value is None:
-            return True
-
         value = str(value)
         prefixes = ["//", "http://", "https://", "file://"]
         for prefix in prefixes:
             if value.startswith(prefix):
                 return True
         return False
-
-    @staticmethod
-    def system_platform():
-        return str(sys.platform).lower()
-
-    @staticmethod
-    def resolve_url_to_path(relative_url, root_path):
-        if not relative_url:
-            return os.path.abspath(os.path.join(root_path, relative_url))

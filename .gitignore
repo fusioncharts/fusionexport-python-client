@@ -91,6 +91,8 @@ ENV/
 
 .DS_Store
 
+.vscode
+
 .idea/*
 .idea/workspace.xml
 

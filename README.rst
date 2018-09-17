@@ -1,13 +1,13 @@
 FusionExport Python Client
 ==========================
 
-Language SDK for FusionExport which enables exporting of charts & dashboards through Python.
+Language SDK for FusionExport which enables exporting of charts and dashboards through Python.
 
 
 Installation
 ------------
 
-To install this Python package, simply use:
+To install this Python package, use pip:
 
 .. code-block:: shell
 
@@ -60,31 +60,9 @@ Now, import the ``fusionexport`` module into your project and write export logic
 
       from fusionexport import ExportManager, ExportConfig  # Import sdk
 
-
-      def read_file(file_path):
-          try:
-              with open(file_path, "r") as f:
-                  return f.read()
-          except Exception as e:
-              print(e)
-
-
-      # Called when export is done
-      def on_export_done(event, error):
-          if error:
-              print(error)
-          else:
-              ExportManager.save_exported_files("exported_images", event["result"])
-
-
-      # Called on each export state change
-      def on_export_state_changed(event):
-          print(event["state"])
-
-
       # Instantiate the ExportConfig class and add the required configurations
       export_config = ExportConfig()
-      export_config["chartConfig"] = read_file("chart-config.json")
+      export_config["chartConfig"] = "./chart-config.json"
 
       # Provide port and host of FusionExport Service
       export_server_host = "127.0.0.1"
@@ -92,10 +70,12 @@ Now, import the ``fusionexport`` module into your project and write export logic
 
       # Instantiate the ExportManager class
       em = ExportManager(export_server_host, export_server_port)
-      # Call the export() method with the export config and the respective callbacks
-      em.export(export_config, on_export_done, on_export_state_changed)
+      # Call the export() method with the export config and the output location
+      exported_files = em.export(export_config, "./exported-charts")
+      print(exported_files)
 
-Now run this file, then the exported chart will be received on ``ExportDone`` event.
+
+Now run this file, then the exported chart files will be saved in ``./exported-charts`` folder.
 
 
 API Reference
