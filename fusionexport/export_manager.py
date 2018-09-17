@@ -37,14 +37,19 @@ class ExportManager(object):
     def export(self, export_config, output_dir='.', unzip=True):
         configs = export_config.get_formatted_configs()
 
+        payloadData = {}
         zip_file_path = None
         zip_file_fd = None
-        if Constants.EXPORT_CONFIG_NAME_PAYLOAD in configs:
-            zip_file_path = configs[Constants.EXPORT_CONFIG_NAME_PAYLOAD]
-            zip_file_fd = open(zip_file_path, 'rb')
-            configs[Constants.EXPORT_CONFIG_NAME_PAYLOAD] = zip_file_fd
+
+        for config_name, config_value in configs.items():
+            if config_name == Constants.EXPORT_CONFIG_NAME_PAYLOAD:
+                zip_file_path = config_value
+                zip_file_fd = open(zip_file_path, 'rb')
+                payloadData[config_name] = ("archive.zip", zip_file_fd, "application/zip")
+            else:
+                payloadData[config_name] = (None, config_value)
         
-        res = requests.post(self.__api_url(), files=configs, stream=True)
+        res = requests.post(self.__api_url(), files=payloadData, stream=True)
         if not res.status_code == 200:
             if zip_file_path is not None:
                 zip_file_fd.close()
@@ -65,13 +70,11 @@ class ExportManager(object):
         if unzip:
             zip_ref = zipfile.ZipFile(temp_export_zip_file, 'r')
             zip_ref.extractall(output_dir)
-            export_files.extend(filter(lambda entry: not entry.endswith("/"), zip_ref.namelist()))
+            export_files.extend(list(filter(lambda entry: not entry.endswith("/"), zip_ref.namelist())))
             zip_ref.close()
         else:
             shutil.copyfile(temp_export_zip_file, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
             export_files.append(Constants.EXPORT_ZIP_FILE_NAME)
-
-        export_files = map(lambda file: os.path.abspath(os.path.join(output_dir, file)), export_files)
         
         if zip_file_path is not None:
             zip_file_fd.close()

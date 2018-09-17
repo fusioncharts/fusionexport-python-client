@@ -35,7 +35,7 @@ class Utils(object):
         if base_path == "":
             raise ExportError("Couldn't calculate the basepath of template resources")
         
-        res_paths = filter(lambda path: Utils.is_within_path(path, base_path), res_paths)
+        res_paths = list(filter(lambda path: Utils.is_within_path(path, base_path), res_paths))
 
         zip_files_map = Utils.create_template_zip_files_map(
             ref_files + res_paths + [template_file_path],
@@ -51,10 +51,10 @@ class Utils(object):
     
     @staticmethod
     def create_template_zip_files_map(paths, base_path):
-        return map(
+        return list(map(
             lambda path: { "zipPath": Utils.create_prefixed_template_zip_path(path, base_path), "localPath": path },
             paths
-        )
+        ))
     
     @staticmethod
     def create_prefixed_template_zip_path(local_path, base_path):

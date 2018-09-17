@@ -88,7 +88,7 @@ class ExportConfig(object):
 
         if Constants.EXPORT_CONFIG_NAME_CHARTCONFIG in configs:
             chart_config_val = configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG]
-            if chart_config_val.endsWith(".json"):
+            if chart_config_val.endswith(".json"):
                 configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG] = Utils.read_text_file(chart_config_val)
         
         if Constants.EXPORT_CONFIG_NAME_INPUTSVG in configs:
@@ -124,7 +124,7 @@ class ExportConfig(object):
                 Constants.EXPORT_CONFIG_ZIP_PATH_OUTPUT_FILE_DEFINITION
             )
 
-        if Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH:
+        if Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH in configs:
             template_zip_files_map, prefixed_template_zip_path = Utils.create_template_zip_paths(
                 configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH],
                 configs.get(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
