@@ -34,7 +34,7 @@ class ExportManager(object):
         else:
             return self.__host
 
-    def export(self, export_config, output_dir='.', unzip=True):
+    def export(self, export_config, output_dir='.', unzip=False):
         configs = export_config.get_formatted_configs()
 
         payloadData = {}
