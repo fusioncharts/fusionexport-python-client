@@ -1,4 +1,5 @@
 {
+  "basePath": "../",
   "include": [
     "*.json", "a/**/*"
   ],

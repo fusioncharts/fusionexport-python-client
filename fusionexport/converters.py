@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-
-
 from .export_error import ExportError
-
 
 class BooleanConverter(object):
     @staticmethod
@@ -13,8 +9,7 @@ class BooleanConverter(object):
         elif value == "false" or value == "0":
             return False
         else:
-            raise ExportError("Value must be boolean value or 1 or 0")
-
+            raise ExportError("Value must be a boolean value or 1 or 0")
 
 class NumberConverter(object):
     @staticmethod
@@ -23,4 +18,4 @@ class NumberConverter(object):
         try:
             return int(value)
         except Exception:
-            raise ExportError("Value must be number value")
+            raise ExportError("Value must be a number")
