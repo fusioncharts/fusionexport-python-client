@@ -6,6 +6,7 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 export_config = ExportConfig()
 export_config["chartConfig"] = "dashboard_charts.json"
 export_config["templateFilePath"] = "template.html"
+export_config["type"] = "pdf"
 
 # Provide port and host of FusionExport Service
 export_server_host = "127.0.0.1"
