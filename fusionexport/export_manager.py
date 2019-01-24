@@ -34,6 +34,15 @@ class ExportManager(object):
         else:
             return self.__host
 
+    def convertResultToBase64String(self, export_files):
+        files = []
+        for file in export_files:
+            print("FILE: %s" % file)
+            with open(file, "rb") as sfile:
+                encoded_string = base64.b64encode(sfile.read())
+            files.append(encoded_string)
+        return files
+
     def export(self, export_config, output_dir='.', unzip=False):
         configs = export_config.get_formatted_configs()
         payloadData = {}
@@ -81,7 +90,13 @@ class ExportManager(object):
         
         shutil.rmtree(temp_dir)
 
-        return export_files
+        files = []
+        for file in export_files:
+            f = os.path.join(output_dir, file)
+            print(f)
+            files.append(f)
+
+        return files
         
     def __api_url(self):
         return "http://%s:%d/api/v2.0/export" % (self.__host, self.__port)
