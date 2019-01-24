@@ -36,7 +36,6 @@ class ExportManager(object):
 
     def export(self, export_config, output_dir='.', unzip=False):
         configs = export_config.get_formatted_configs()
-
         payloadData = {}
         zip_file_path = None
         zip_file_fd = None

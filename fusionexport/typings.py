@@ -5,6 +5,15 @@ typings = {
     "inputSVG": {
         "type": "string"
     },
+    "templateFormat": {
+        "type": "string"
+    },
+    "templateWidth": {
+        "type": "string"
+    },
+    "templateHeight": {
+        "type": "string"
+    },
     "templateFilePath": {
         "type": "string"
     },

@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 from .constants import Constants
 from .utils import Utils
@@ -125,6 +126,14 @@ class ExportConfig(object):
             )
 
         if Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH in configs:
+            fileContent = configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH]
+            # If it is not a file but html content, then save the content to a temp file and set the path of that temp file
+            if (fileContent.startswith("<")):
+                tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+                tmp.writelines(fileContent)
+                tmp.close();
+                configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH] = tmp.name
+
             template_zip_files_map, prefixed_template_zip_path = Utils.create_template_zip_paths(
                 configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH],
                 configs.get(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
