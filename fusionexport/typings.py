@@ -9,10 +9,12 @@ typings = {
         "type": "string"
     },
     "templateWidth": {
-        "type": "string"
+        "type": "integer",
+        "converter": "NumberConverter"
     },
     "templateHeight": {
-        "type": "string"
+        "type": "integer",
+        "converter": "NumberConverter"
     },
     "templateFilePath": {
         "type": "string"
