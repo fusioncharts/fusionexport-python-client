@@ -1,5 +1,6 @@
 import os
 import tempfile
+import json
 
 from .constants import Constants
 from .utils import Utils
@@ -22,6 +23,8 @@ class ExportConfig(object):
         return self.get(key)
 
     def set(self, config_name, config_value):
+        if (isinstance(config_value, dict)):
+            config_value = json.dumps(config_value)
         self.__configs[config_name] = self.__resolve_config_value(config_name, config_value)
 
     def __resolve_config_value(self, config_name, config_value):
