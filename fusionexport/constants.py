@@ -11,6 +11,7 @@ class Constants(object):
     EXPORT_CONFIG_NAME_ASYNC_CAPTURE = 'asyncCapture'
     EXPORT_CONFIG_NAME_PAYLOAD = 'payload'
     EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH = "templateFilePath"
+    EXPORT_CONFIG_NAME_TEMPLATE = "template"
     EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH = "resourceFilePath"
 
     EXPORT_CONFIG_ZIP_PATH_INPUTSVG = "inputSVG.svg"

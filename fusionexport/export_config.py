@@ -6,7 +6,7 @@ from .constants import Constants
 from .utils import Utils
 from .export_error import ExportError
 from .typings import typings
-from .converters import BooleanConverter, NumberConverter
+from .converters import BooleanConverter, NumberConverter, ChartConfigConverter, EnumConverter
 
 class ExportConfig(object):
     def __init__(self, config_dict=None):
@@ -34,9 +34,14 @@ class ExportConfig(object):
         converter = typings[config_name].get("converter", None)
         if converter is not None:
             if converter == "BooleanConverter":
-                return BooleanConverter.convert(config_value)
+                return BooleanConverter.convert(config_value, config_name)
             elif converter == "NumberConverter":
-                return NumberConverter.convert(config_value)
+                return NumberConverter.convert(config_value, config_name)
+            elif converter == "ChartConfigConverter":
+                return ChartConfigConverter.convert(config_value)
+            elif converter == "EnumConverter":
+                dataset = typings[config_name].get("dataset")
+                return EnumConverter.convert(config_value, dataset, config_name)
             else:
                 raise ExportError("Unknown converter: %s" % converter)
         elif typings[config_name]["type"] == "string":
@@ -89,6 +94,8 @@ class ExportConfig(object):
     def __process_config_values(self):
         configs = self.__configs.copy()
         zip_files_map = []
+        
+        configs["clientName"] = "Python"
 
         if Constants.EXPORT_CONFIG_NAME_CHARTCONFIG in configs:
             chart_config_val = configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG]

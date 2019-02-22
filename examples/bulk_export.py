@@ -13,5 +13,5 @@ export_server_port = 1337
 # Instantiate the ExportManager class
 em = ExportManager(export_server_host, export_server_port)
 # Call the export() method with the export config and the output location
-exported_files = em.export(export_config, "./exports")
+exported_files = em.export(export_config, "./exports", True)
 print(exported_files)

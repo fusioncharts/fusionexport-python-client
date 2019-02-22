@@ -56,7 +56,7 @@ class ExportManager(object):
                 payloadData[config_name] = ("archive.zip", zip_file_fd, "application/zip")
             else:
                 payloadData[config_name] = (None, config_value)
-        
+
         res = requests.post(self.__api_url(), files=payloadData, stream=True)
         if not res.status_code == 200:
             if zip_file_path is not None:
@@ -66,6 +66,7 @@ class ExportManager(object):
 
         temp_dir = tempfile.mkdtemp()
         temp_export_zip_file = os.path.abspath(os.path.join(temp_dir, Constants.EXPORT_ZIP_FILE_NAME))
+        
         with open(temp_export_zip_file, 'wb') as fd:
             for chunk in res.iter_content(chunk_size=1024):
                 fd.write(chunk)
@@ -93,7 +94,6 @@ class ExportManager(object):
         files = []
         for file in export_files:
             f = os.path.join(output_dir, file)
-            print(f)
             files.append(f)
 
         return files
