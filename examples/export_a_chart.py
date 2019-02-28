@@ -4,7 +4,11 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["chartConfig"] = "chart-config-file.json"
+#export_config["chartConfig"] = {'type':'column2d','dataSource':{'chart':{'caption':'Caption'},'data':[{'value': 20}]}}
+
+export_config["chartConfig"] = "{\"type\":\"column2d\",\"dataSource\":{\"chart\":{\"caption\":\"Caption\"},\"data\":[{\"value\": 20}]}}" #"chart-config-user.json" #chart-config-file.json"
+# export_config["chartConfig"] = "chart-config-user.json" #chart-config-file.json"
+#export_config["templateFilePath"] = "<html> </html>"
 
 # Provide port and host of FusionExport Service
 export_server_host = "127.0.0.1"
@@ -13,5 +17,5 @@ export_server_port = 1337
 # Instantiate the ExportManager class
 em = ExportManager(export_server_host, export_server_port)
 # Call the export() method with the export config and the output location
-exported_files = em.export(export_config, "./exports")
+exported_files = em.export(export_config, "./exports", True)
 print(exported_files)

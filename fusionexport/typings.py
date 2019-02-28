@@ -6,15 +6,18 @@ typings = {
     },
     "inputSVG": {
         "type": "string",
-        "supportedTypes": ["file"]
+        "supportedTypes": ["file"],
+        "converter": "FileConverter"
     },
     "template": {
         "type": "string",
-        "supportedTypes": ["string"]
+        "supportedTypes": ["string"],
+        "converter": "HtmlConverter"
     },
     "templateFilePath": {
         "type": "string",
-        "supportedTypes": ["file"]
+        "supportedTypes": ["file"],
+        "converter": "FileConverter"
     },
     "templateWidth": {
         "type": "integer",
@@ -45,7 +48,8 @@ typings = {
     },
     "callbackFilePath": {
         "type": "string",
-        "supportedTypes": ["file"]
+        "supportedTypes": ["file"],
+        "converter": "FileConverter"
     },
     "asyncCapture": {
         "type": "boolean",
@@ -101,10 +105,12 @@ typings = {
     },
     "outputFileDefinition": {
         "type": "string",
-        "supportedTypes": ["file"]
+        "supportedTypes": ["file"],
+        "converter": "FileConverter"
     },
     "resourceFilePath": {
         "type": "string",
-        "supportedTypes": ["file"]
+        "supportedTypes": ["file"],
+        "converter": "FileConverter"
     }
 }

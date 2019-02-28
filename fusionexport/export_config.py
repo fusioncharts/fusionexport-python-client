@@ -6,7 +6,7 @@ from .constants import Constants
 from .utils import Utils
 from .export_error import ExportError
 from .typings import typings
-from .converters import BooleanConverter, NumberConverter, ChartConfigConverter, EnumConverter
+from .converters import BooleanConverter, NumberConverter, ChartConfigConverter, EnumConverter, FileConverter, HtmlConverter
 
 class ExportConfig(object):
     def __init__(self, config_dict=None):
@@ -23,13 +23,21 @@ class ExportConfig(object):
         return self.get(key)
 
     def set(self, config_name, config_value):
-        if (isinstance(config_value, dict)):
-            config_value = json.dumps(config_value)
+        #if (isinstance(config_value, dict)):
+            #config_value = json.dumps(config_value)
         self.__configs[config_name] = self.__resolve_config_value(config_name, config_value)
 
     def __resolve_config_value(self, config_name, config_value):
         if config_name not in typings:
             raise ExportError("Invalid export config: %s" % config_name)
+
+        if config_name == "template":
+            if "templateFilePath" in self.__configs:
+                print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
+
+        if config_name == "templateFilePath":
+            if "template" in self.__configs:
+                print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
 
         converter = typings[config_name].get("converter", None)
         if converter is not None:
@@ -42,6 +50,10 @@ class ExportConfig(object):
             elif converter == "EnumConverter":
                 dataset = typings[config_name].get("dataset")
                 return EnumConverter.convert(config_value, dataset, config_name)
+            elif converter == "FileConverter":
+                return FileConverter.convert(config_value, config_name)
+            elif converter == "HtmlConverter":
+                return HtmlConverter.convert(config_value, config_name)
             else:
                 raise ExportError("Unknown converter: %s" % converter)
         elif typings[config_name]["type"] == "string":
@@ -97,11 +109,6 @@ class ExportConfig(object):
         
         configs["clientName"] = "Python"
 
-        if Constants.EXPORT_CONFIG_NAME_CHARTCONFIG in configs:
-            chart_config_val = configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG]
-            if chart_config_val.endswith(".json"):
-                configs[Constants.EXPORT_CONFIG_NAME_CHARTCONFIG] = Utils.read_text_file(chart_config_val)
-        
         if Constants.EXPORT_CONFIG_NAME_INPUTSVG in configs:
             self.__resolve_zip_path_config(
                 configs,

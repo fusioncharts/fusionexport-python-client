@@ -27,7 +27,7 @@ class NumberConverter(object):
 class ChartConfigConverter(object):
     @staticmethod
     def convert(value):
-        if (type(value)!=type("")):
+        if (type(value) == type({})):
             value = json.dumps(value)
         valueToLower = str(value).lower()
         if valueToLower.endswith(".json"):
@@ -49,3 +49,24 @@ class EnumConverter(object):
             return value
         else:
             raise ExportError("Invalid value for parameter '" + config_name + "': Accepted values are "  + ", ".join(dataset))
+
+class FileConverter(object):
+    @staticmethod
+    def convert(value, config_name):
+        if (type(value) == type("")):
+            if os.path.isfile(value) == False :
+                raise ExportError("URL/File Path in '" + config_name + "' not found. Please provide an appropriate path")
+            return value
+        else:
+            raise ExportError("Invalid Data Type for parameter '" + config_name +"': Data should be a string")
+
+class HtmlConverter(object):
+    @staticmethod
+    def convert(value, config_name):
+        print(value)
+        if (type(value) == type("")):
+            if value.startswith("<") == False or value.lower().endswith("</html>") == False :
+                raise ExportError(config_name + ": String should be a valid HTML template")
+            return value
+        else:
+            raise ExportError("Invalid Data Type for parameter '" + config_name +"': Data should be a string")
