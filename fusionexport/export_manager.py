@@ -66,11 +66,11 @@ class ExportManager(object):
 
             temp_dir = tempfile.mkdtemp()
             temp_export_zip_file = os.path.abspath(os.path.join(temp_dir, "python_" + Constants.EXPORT_ZIP_FILE_NAME))
-            
+
             with open(temp_export_zip_file, 'wb') as fd:
                 for chunk in res.iter_content(chunk_size=1024):
                     fd.write(chunk)
-        
+
             output_dir = os.path.abspath(output_dir)
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -85,11 +85,11 @@ class ExportManager(object):
             else:
                 shutil.copyfile(temp_export_zip_file, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
                 export_files.append(Constants.EXPORT_ZIP_FILE_NAME)
-            
+
             if zip_file_path is not None:
                 zip_file_fd.close()
                 shutil.rmtree(os.path.dirname(zip_file_path))
-            
+
             shutil.rmtree(temp_dir)
 
             files = []
@@ -98,13 +98,9 @@ class ExportManager(object):
                 files.append(f)
 
             return files
-        
+
         except (requests.ConnectionError, requests.ConnectTimeout):
-            ExportError("Connection Refused:\nUnable to connect to FusionExport server. Make sure that your server is running on %s:%s" % (self.__host, self.__port))
-            exit
-        #except requests.HTTPError:
-        #    print ("SERVER ERROR:")
-        #    exit
-        
+            raise ExportError("Connection Refused: Unable to connect to FusionExport server. Make sure that your server is running on %s:%s" % (self.__host, self.__port))
+
     def __api_url(self):
         return "http://%s:%d/api/v2.0/export" % (self.__host, self.__port)
