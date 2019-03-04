@@ -6,13 +6,12 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
 
-# export_config["chartConfig"] = "dashboard_charts.json"
+export_config["chartConfig"] = "dashboard_charts.json"
 
-#export_config["templateFilePath"] = "template.html"
-#export_config["type"] = "png"
-#export_config["templateFormat"] = "A1"
-#export_config["templateHeight"] = 600
-#export_config["template"] = "<html></html>"
+export_config["templateFilePath"] = "template.html"
+export_config["type"] = "png"
+export_config["templateFormat"] = "A1"
+export_config["templateHeight"] = 600
 
 
 # Provide port and host of FusionExport Service

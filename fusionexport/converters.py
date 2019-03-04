@@ -63,7 +63,6 @@ class FileConverter(object):
 class HtmlConverter(object):
     @staticmethod
     def convert(value, config_name):
-        print(value)
         if (type(value) == type("")):
             if value.startswith("<") == False or value.lower().endswith("</html>") == False :
                 raise ExportError(config_name + ": String should be a valid HTML template")
