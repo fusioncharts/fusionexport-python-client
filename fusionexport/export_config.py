@@ -35,6 +35,10 @@ class ExportConfig(object):
             if "templateFilePath" in self.__configs or "template" in self.__configs:
                 print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
 
+        #if config_name == "templateFilePath":
+        #    if "template" in self.__configs:
+        #        print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
+
         converter = typings[config_name].get("converter", None)
         if converter is not None:
             if converter == "BooleanConverter":

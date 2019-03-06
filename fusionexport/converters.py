@@ -40,7 +40,8 @@ class ChartConfigConverter(object):
                 json.loads(value)
                 return value
             except Exception:
-                raise ExportError("Invalid Data Type for parameter 'chartConfig': Data should be a valid JSON string")
+                #type(value).__name__
+                raise ExportError(("chartConfig of type '%s' is unsupported. Supported data types are string, object,array & file path." % type(value).__name__))
 
 class EnumConverter(object):
     @staticmethod
