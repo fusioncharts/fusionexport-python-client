@@ -23,8 +23,6 @@ class ExportConfig(object):
         return self.get(key)
 
     def set(self, config_name, config_value):
-        #if (isinstance(config_value, dict)):
-            #config_value = json.dumps(config_value)
         self.__configs[config_name] = self.__resolve_config_value(config_name, config_value)
 
     def __resolve_config_value(self, config_name, config_value):
@@ -34,10 +32,6 @@ class ExportConfig(object):
         if config_name == "template" or config_name == "templateFilePath":
             if "templateFilePath" in self.__configs or "template" in self.__configs:
                 print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
-
-        #if config_name == "templateFilePath":
-        #    if "template" in self.__configs:
-        #        print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
 
         converter = typings[config_name].get("converter", None)
         if converter is not None:

@@ -7,22 +7,21 @@ from .utils import Utils
 class BooleanConverter(object):
     @staticmethod
     def convert(value, config_name):
-        value = str(value).lower()
-        if value == "true" or value == "1":
+        value_lower = str(value).lower()
+        if value_lower == "true" or value == "1":
             return True
-        elif value == "false" or value == "0":
+        elif value_lower == "false" or value == "0":
             return False
         else:
-            raise ExportError("Invalid Data Type for parameter: '" + config_name + "': Value must be a string, boolean or, 1 or 0")
+            raise ExportError("'%s' of type '%s' is unsupported. Supported data types are string, boolean, 1 or 0" % (config_name, type(value).__name__))
 
 class NumberConverter(object):
     @staticmethod
     def convert(value, config_name):
-        value = str(value).lower()
         try:
-            return int(value)
+            return int(str(value))
         except Exception:
-            raise ExportError("Invalid Data Type for parameter: '" + config_name + "': Value must be a string, number")
+            raise ExportError("'%s' of type '%s' is unsupported. Supported data types are string, number" % (config_name, type(value).__name__))
 
 class ChartConfigConverter(object):
     @staticmethod
@@ -40,7 +39,6 @@ class ChartConfigConverter(object):
                 json.loads(value)
                 return value
             except Exception:
-                #type(value).__name__
                 raise ExportError(("chartConfig of type '%s' is unsupported. Supported data types are string, object,array & file path." % type(value).__name__))
 
 class EnumConverter(object):
@@ -59,7 +57,7 @@ class FileConverter(object):
                 raise ExportError("URL/File Path in '" + config_name + "' not found. Please provide an appropriate path")
             return value
         else:
-            raise ExportError("Invalid Data Type for parameter '" + config_name +"': Data should be a string")
+            raise ExportError("'%s' of type '%s' is unsupported. Supported data types is string" % (config_name, type(value).__name__))
 
 class HtmlConverter(object):
     @staticmethod
@@ -69,4 +67,4 @@ class HtmlConverter(object):
                 raise ExportError(config_name + ": String should be a valid HTML template")
             return value
         else:
-            raise ExportError("Invalid Data Type for parameter '" + config_name +"': Data should be a string")
+            raise ExportError("'%s' of type '%s' is unsupported. Supported data types is string" % (config_name, type(value).__name__))
