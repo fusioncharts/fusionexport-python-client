@@ -54,7 +54,7 @@ class FileConverter(object):
     def convert(value, config_name):
         if (type(value) == type("")):
             if os.path.isfile(value) == False :
-                raise ExportError("URL/File Path in '" + config_name + "' not found. Please provide an appropriate path")
+                raise ExportError("URL/File path in '" + config_name + "' not found. Please provide an appropriate path")
             return value
         else:
             raise ExportError("'%s' of type '%s' is unsupported. Supported data types is string" % (config_name, type(value).__name__))

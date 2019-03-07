@@ -101,4 +101,4 @@ examples/exported_images/
 examples/exports/
 
 test_*.*
-export--*.*
+export*.*
