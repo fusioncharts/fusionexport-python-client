@@ -26,7 +26,7 @@ class NumberConverter(object):
 class ChartConfigConverter(object):
     @staticmethod
     def convert(value):
-        if (type(value) == type({})):
+        if (type(value) == type({}) or type(value) == type([])):
             value = json.dumps(value)
         valueToLower = str(value).lower()
         if valueToLower.endswith(".json"):
