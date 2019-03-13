@@ -1,38 +1,40 @@
 #!/usr/bin/env python
-
 from fusionexport import ExportManager, ExportConfig  # Import sdk
-
-
-def read_file(file_path):
-    try:
-        with open(file_path, "r") as f:
-            return f.read()
-    except Exception as e:
-        print(e)
-
-
-# Called when export is done
-def on_export_done(event, error):
-    if error:
-        print(error)
-    else:
-        ExportManager.save_exported_files("exported_images", event["result"])
-
-
-# Called on each export state change
-def on_export_state_changed(event):
-    print(event["state"])
 
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["chartConfig"] = read_file("chart-config-file.json")
 
-# Provide port and host of FusionExport Service
-export_server_host = "127.0.0.1"
-export_server_port = 1337
+export_config["chartConfig"] = [{
+    "type": "column2d",
+    "renderAt": "chart-container",
+    "width": "600",
+    "height": "400",
+    "dataFormat": "json",
+    "dataSource": {
+        "chart": {
+            "caption": "Number of visitors last week",
+            "subCaption": "Bakersfield Central vs Los Angeles Topanga"
+        },
+        "data": [{
+                "label": "Mon",
+                "value": "15123"
+            },{
+                "label": "Tue",
+                "value": "14233"
+            },{
+                "label": "Wed",
+                "value": "25507"
+            }
+        ]
+    }
+}]
 
 # Instantiate the ExportManager class
-em = ExportManager(export_server_host, export_server_port)
-# Call the export() method with the export config and the respective callbacks
-em.export(export_config, on_export_done, on_export_state_changed)
+em = ExportManager()
+
+# Call the export() method with the export config and the output location
+exported_files = em.export(export_config, "./exports", True)
+
+# print list of exported files
+print(exported_files)
