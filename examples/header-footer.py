@@ -10,7 +10,7 @@ export_config["chartConfig"] = "dashboard_charts.json"
 
 export_config["templateFilePath"] = "template.html"
 export_config["type"] = "pdf"
-export_config["headerEnabled"] = "true"
+export_config["headerEnabled"] = True
 export_config["pageMargin"] = {
     "top": "50px"
 }

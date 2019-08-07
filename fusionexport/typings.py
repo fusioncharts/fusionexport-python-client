@@ -104,12 +104,14 @@ typings = {
         ]
     },
     "headerEnabled": {
-        "type": "string",
-        "supportedTypes": ["string"]
+        "type": "boolean",
+        "supportedTypes": ["string", "boolean"],
+        "converter": "BooleanConverter"
     },
     "footerEnabled": {
-        "type": "string",
-        "supportedTypes": ["string"]
+        "type": "boolean",
+        "supportedTypes": ["string", "boolean"],
+        "converter": "BooleanConverter"
     },
     "headerComponents": {
         "type": "string",

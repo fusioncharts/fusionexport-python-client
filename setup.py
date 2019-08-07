@@ -7,7 +7,7 @@ with open('README.rst') as readme_file:
 
 setup(
     name='fusionexport',
-    version='1.1.0',
+    version='1.2.0',
     description='The FusionExport SDK in Python',
     long_description=readme,
     author='FusionCharts',
