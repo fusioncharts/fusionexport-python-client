@@ -68,3 +68,10 @@ class HtmlConverter(object):
             return value
         else:
             raise ExportError("'%s' of type '%s' is unsupported. Supported data types is string" % (config_name, type(value).__name__))
+
+class ObjectConverter(object):
+    @staticmethod
+    def convert(value, config_name):
+        if(type(value) == type({})):
+            value = json.dumps(value)
+            return value
