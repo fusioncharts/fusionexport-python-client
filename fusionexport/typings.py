@@ -103,6 +103,31 @@ typings = {
             "best"
         ]
     },
+    "headerEnabled": {
+        "type": "boolean",
+        "supportedTypes": ["string", "boolean"],
+        "converter": "BooleanConverter"
+    },
+    "footerEnabled": {
+        "type": "boolean",
+        "supportedTypes": ["string", "boolean"],
+        "converter": "BooleanConverter"
+    },
+    "headerComponents": {
+        "type": "string",
+        "supportedTypes": ["string", "object"],
+        "converter": "ObjectConverter"
+    },
+    "footerComponents": {
+        "type": "string",
+        "supportedTypes": ["string", "object"],
+        "converter": "ObjectConverter"
+    },
+    "pageMargin": {
+        "type": "string",
+        "supportedTypes": ["string", "object"],
+        "converter": "ObjectConverter"
+    },
     "outputFileDefinition": {
         "type": "string",
         "supportedTypes": ["file"],
