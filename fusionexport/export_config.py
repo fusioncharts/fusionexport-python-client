@@ -6,7 +6,7 @@ from .constants import Constants
 from .utils import Utils
 from .export_error import ExportError
 from .typings import typings
-from .converters import BooleanConverter, NumberConverter, ChartConfigConverter, EnumConverter, FileConverter, HtmlConverter
+from .converters import BooleanConverter, NumberConverter, ChartConfigConverter, EnumConverter, FileConverter, HtmlConverter, ObjectConverter
 
 class ExportConfig(object):
     def __init__(self, config_dict=None):
@@ -48,6 +48,8 @@ class ExportConfig(object):
                 return FileConverter.convert(config_value, config_name)
             elif converter == "HtmlConverter":
                 return HtmlConverter.convert(config_value, config_name)
+            elif converter == "ObjectConverter":
+                return ObjectConverter.convert(config_value, config_name)
             else:
                 raise ExportError("Unknown converter: %s" % converter)
         elif typings[config_name]["type"] == "string":
