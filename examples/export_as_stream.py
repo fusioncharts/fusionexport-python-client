@@ -8,7 +8,7 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
 
-export_config["chartConfig"] = "D:\\_Work@FusionCharts\\FusionExport_Code\\fusionexport-python-client\\examples\\config-user.json"
+export_config["chartConfig"] = "config-user.json"
 
 # Instantiate the ExportManager class
 em = ExportManager(host="127.0.0.1", port=1337)
