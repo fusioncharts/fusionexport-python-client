@@ -118,7 +118,9 @@ class ExportManager(object):
             export_files.extend(list(filter(lambda entry: not entry.endswith("/"), zip_ref.namelist())))
             zip_ref.close()
         else:
-            shutil.copyfileobj(buff, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
+            with open (os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)), 'wb') as f:
+                f.write(buff.read())
+            #shutil.copyfileobj(buff, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
             export_files.append(Constants.EXPORT_ZIP_FILE_NAME)
             buff.close()
 
