@@ -10,8 +10,8 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["chartConfig"] = "dashboard_charts.json"
-export_config["templateFilePath"] = "template.html"
+export_config["chartConfig"] = "resources/multiple.json"
+export_config["templateFilePath"] = "resources/template.html"
 export_config["type"] = "pdf"
 export_config["headerEnabled"] = True
 
@@ -50,4 +50,4 @@ server.login('9217733c3a014f', '39564c5d1ddd00')
 server.sendmail(mail['From'], mail['To'], mail.as_string())
 server.quit()
 
-print "FusionExport Python Client: email sent"
+print ("FusionExport Python Client: email sent")
