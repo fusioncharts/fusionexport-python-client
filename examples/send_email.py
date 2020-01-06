@@ -26,8 +26,8 @@ exported_files = em.export(export_config, "./exports", True)
 
 # Sending email
 mail = MIMEMultipart()
-mail['From'] = "<FROM EMAIL ID>"
-mail['To'] = "<TO EMAIL ID>"
+mail['From'] = "<SENDER'S EMAIL>"
+mail['To'] = "<RECEIVERS'S EMAIL>"
 mail['Subject'] = "FusionExport"
 mail.attach(MIMEText('''Hello,
 
@@ -44,9 +44,9 @@ for f in exported_files or []:
         mail.attach(part)
 
 # Connect to SMTP Server
-server = smtplib.SMTP('smtp.mailtrap.io: 587')
+server = smtplib.SMTP('<HOST>: 587')
 server.starttls()
-server.login('9217733c3a014f', '39564c5d1ddd00')
+server.login('<USERNAME>', '<PASSWORD>')
 server.sendmail(mail['From'], mail['To'], mail.as_string())
 server.quit()
 
