@@ -1,6 +1,7 @@
 class Constants(object):
     DEFAULT_SERVICE_HOST = "127.0.0.1"
     DEFAULT_SERVICE_PORT = 1337
+    DEFAULT_IS_SECURE = False
 
     EXPORT_CONFIG_NAME_CHARTCONFIG = 'chartConfig'
     EXPORT_CONFIG_NAME_INPUTSVG = 'inputSVG'
