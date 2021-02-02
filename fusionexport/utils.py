@@ -5,6 +5,9 @@ import os
 import glob2
 import tempfile
 import shutil
+import re
+import cssutils
+
 from bs4 import BeautifulSoup
 
 from .constants import Constants
@@ -26,7 +29,7 @@ class Utils(object):
     @staticmethod
     def create_template_zip_paths(template_file_path, resource_file_path):
         template_file_path = os.path.abspath(template_file_path)
-
+        
         ref_files = Utils.extract_ref_files_from_template(template_file_path)
         base_path, res_paths = Utils.normalize_resource_file_paths(resource_file_path)
         if base_path is None:
@@ -107,7 +110,76 @@ class Utils(object):
             ref = Utils.resolve_template_ref(link.get("href"), template_file_dir)
             if ref is not None:
                 ref_files.append(ref)
+    
+        style_sheet_dir = os.path.dirname(ref)
+        style_sheet = Utils.read_text_file(ref)
+        
+        styles = html_soup.findAll('style')
+        
+        for style in styles:
 
+            html_sheet = cssutils.parseString(style.encode_contents())
+            
+            for rule in html_sheet:
+                
+                if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
+                    for property in rule.style:
+                        if property.name == 'src':
+                            woff = re.search(r'.*url\((.*woff)\)\.*', property.value)
+                            if woff:
+                                woff_ref = Utils.resolve_template_ref(woff.group(1), template_file_dir)
+                                ref_files.append(woff_ref)
+                            woff2 = re.search(r'.*url\((.*woff2)\)\.*', property.value)
+                            if woff2:
+                                woff2_ref = Utils.resolve_template_ref(woff2.group(1), template_file_dir)
+                                ref_files.append(woff2_ref)
+                            ttf = re.search(r'.*url\((.*ttf)\)\.*', property.value)
+                            if ttf:
+                                ttf_ref = Utils.resolve_template_ref(ttf.group(1), template_file_dir)
+                                ref_files.append(ttf_ref)
+                            otf = re.search(r'.*url\((.*otf)\)\.*', property.value)
+                            if otf:
+                                otf_ref = Utils.resolve_template_ref(otf.group(1), template_file_dir)
+                                ref_files.append(otf_ref)
+                            svg = re.search(r'.*url\((.*svg)\)\.*', property.value)
+                            if svg:
+                                svg_ref = Utils.resolve_template_ref(svg.group(1), template_file_dir)
+                                ref_files.append(svg_ref)
+                            eot = re.search(r'.*url\((.*eot)\)\.*', property.value)
+                            if eot:
+                                eot_ref = Utils.resolve_template_ref(eot.group(1), template_file_dir)
+                                ref_files.append(eot_ref)
+        
+        sheet = cssutils.parseString(style_sheet)
+        for rule in sheet:
+            if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
+                for property in rule.style:
+                    if property.name == 'src':
+                        woff = re.search(r'.*url\((.*woff)\)\.*', property.value)
+                        if woff:
+                            woff_ref = Utils.resolve_template_ref(woff.group(1), style_sheet_dir)
+                            ref_files.append(woff_ref)
+                        woff2 = re.search(r'.*url\((.*woff2)\)\.*', property.value)
+                        if woff2:
+                            woff2_ref = Utils.resolve_template_ref(woff2.group(1), style_sheet_dir)
+                            ref_files.append(woff2_ref)
+                        ttf = re.search(r'.*url\((.*ttf)\)\.*', property.value)
+                        if ttf:
+                            ttf_ref = Utils.resolve_template_ref(ttf.group(1), style_sheet_dir)
+                            ref_files.append(ttf_ref)
+                        otf = re.search(r'.*url\((.*otf)\)\.*', property.value)
+                        if otf:
+                            otf_ref = Utils.resolve_template_ref(otf.group(1), style_sheet_dir)
+                            ref_files.append(otf_ref)
+                        svg = re.search(r'.*url\((.*svg)\)\.*', property.value)
+                        if svg:
+                            svg_ref = Utils.resolve_template_ref(svg.group(1), style_sheet_dir)
+                            ref_files.append(svg_ref)
+                        eot = re.search(r'.*url\((.*eot)\)\.*', property.value)
+                        if eot:
+                            eot_ref = Utils.resolve_template_ref(eot.group(1), style_sheet_dir)
+                            ref_files.append(eot_ref)
+                       
         for script in html_soup.find_all('script'):
             ref = Utils.resolve_template_ref(script.get("src"), template_file_dir)
             if ref is not None:
