@@ -13,7 +13,7 @@ from .utils import Utils
 
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 class ExportManager(object):
-    def __init__(self, host=None, port=None, is_secure=None):
+    def __init__(self, host=None, port=None, is_secure=None, minify_resources=None):
         if host is not None:
             self.__host = host
         else:
@@ -28,6 +28,11 @@ class ExportManager(object):
             self.__is_secure = bool(is_secure)
         else:
             self.__is_secure = bool(Constants.DEFAULT_IS_SECURE)
+
+        if minify_resources is not None:
+            self.__minify_resources = bool(minify_resources)
+        else:
+            self.__minify_resources = bool(Constants.DEFAULT_MINIFY_RESOURCES)
         
     def port(self, port=None):
         if port is not None:
@@ -46,6 +51,12 @@ class ExportManager(object):
             self.__is_secure = bool(is_secure)
         else:
             return self.__is_secure
+    
+    def minify_resources(self, minify_resources=None):
+        if minify_resources is not None:
+            self.__minify_resources = bool(minify_resources)
+        else:
+            return self.__minify_resources
 
     def convertResultToBase64String(self, export_files):
         files = []
@@ -57,7 +68,7 @@ class ExportManager(object):
         return files
 
     def __exportCore(self, export_config):
-        configs = export_config.get_formatted_configs()
+        configs = export_config.get_formatted_configs(self.__minify_resources)
         payloadData = {}
         zip_file_path = None
         zip_file_fd = None
@@ -131,6 +142,7 @@ class ExportManager(object):
             export_files.extend(list(filter(lambda entry: not entry.endswith("/"), zip_ref.namelist())))
             zip_ref.close()
         else:
+            print(buff, output_dir)
             shutil.copyfileobj(buff, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
             export_files.append(Constants.EXPORT_ZIP_FILE_NAME)
             buff.close()

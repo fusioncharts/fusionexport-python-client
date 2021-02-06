@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import re
 import cssutils
+from css_html_js_minify import process_single_html_file, process_single_js_file, process_single_css_file
 
 from bs4 import BeautifulSoup
 
@@ -27,10 +28,10 @@ class Utils(object):
             return None
 
     @staticmethod
-    def create_template_zip_paths(template_file_path, resource_file_path):
+    def create_template_zip_paths(template_file_path, resource_file_path, minify_resources=False):
         template_file_path = os.path.abspath(template_file_path)
         
-        ref_files = Utils.extract_ref_files_from_template(template_file_path)
+        ref_files = Utils.extract_ref_files_from_template(template_file_path, minify_resources)
         base_path, res_paths = Utils.normalize_resource_file_paths(resource_file_path)
         if base_path is None:
             base_path = Utils.get_common_path([template_file_path] + ref_files)
@@ -94,9 +95,21 @@ class Utils(object):
     @staticmethod
     def get_common_path(paths):
         return os.path.abspath(os.path.dirname(os.path.commonprefix(paths)))
+    
+    @staticmethod
+    def add_font_ref(content, file_dir, ref_files):
+        sheet = cssutils.parseString(content)
+        for rule in sheet:
+            if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
+                for property in rule.style:
+                    if property.name == 'src':
+                        font_re = re.search(r'.*url\((.*(woff|woff2|ttf|otf|svg|eot))\)\.*', property.value)
+                        if font_re:
+                            font_ref = Utils.resolve_template_ref(font_re.group(1), file_dir)
+                            ref_files.append(font_ref)
 
     @staticmethod
-    def extract_ref_files_from_template(template_file_path):
+    def extract_ref_files_from_template(template_file_path, minify_resources=False):
         if template_file_path is None:
             return []
 
@@ -109,82 +122,39 @@ class Utils(object):
         for link in html_soup.find_all('link'):
             ref = Utils.resolve_template_ref(link.get("href"), template_file_dir)
             if ref is not None:
-                ref_files.append(ref)
-    
-        style_sheet_dir = os.path.dirname(ref)
-        style_sheet = Utils.read_text_file(ref)
+                is_html = True
+                if ref.endswith('.css'):
+                    is_html = False
+                if minify_resources:
+                    if is_html:
+                        ref_files.append(process_single_html_file(ref, overwrite=True))
+                    else:
+                        ref_files.append(process_single_css_file(ref, overwrite=True))
+                else:
+                    ref_files.append(ref)
+                file_dir = os.path.dirname(ref)
+                ref_file_content = Utils.read_text_file(ref)
+                if is_html:
+                    ref_soup = BeautifulSoup(ref_file_content, 'html.parser')
+                    ref_styles = ref_soup.findAll('style')
+                    for ref_style in ref_styles:
+                        Utils.add_font_ref(ref_style.encode_contents(), file_dir, ref_files)
+                else:
+                    Utils.add_font_ref(ref_file_content, file_dir, ref_files)
         
         styles = html_soup.findAll('style')
-        
+    
         for style in styles:
-
-            html_sheet = cssutils.parseString(style.encode_contents())
-            
-            for rule in html_sheet:
-                
-                if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
-                    for property in rule.style:
-                        if property.name == 'src':
-                            woff = re.search(r'.*url\((.*woff)\)\.*', property.value)
-                            if woff:
-                                woff_ref = Utils.resolve_template_ref(woff.group(1), template_file_dir)
-                                ref_files.append(woff_ref)
-                            woff2 = re.search(r'.*url\((.*woff2)\)\.*', property.value)
-                            if woff2:
-                                woff2_ref = Utils.resolve_template_ref(woff2.group(1), template_file_dir)
-                                ref_files.append(woff2_ref)
-                            ttf = re.search(r'.*url\((.*ttf)\)\.*', property.value)
-                            if ttf:
-                                ttf_ref = Utils.resolve_template_ref(ttf.group(1), template_file_dir)
-                                ref_files.append(ttf_ref)
-                            otf = re.search(r'.*url\((.*otf)\)\.*', property.value)
-                            if otf:
-                                otf_ref = Utils.resolve_template_ref(otf.group(1), template_file_dir)
-                                ref_files.append(otf_ref)
-                            svg = re.search(r'.*url\((.*svg)\)\.*', property.value)
-                            if svg:
-                                svg_ref = Utils.resolve_template_ref(svg.group(1), template_file_dir)
-                                ref_files.append(svg_ref)
-                            eot = re.search(r'.*url\((.*eot)\)\.*', property.value)
-                            if eot:
-                                eot_ref = Utils.resolve_template_ref(eot.group(1), template_file_dir)
-                                ref_files.append(eot_ref)
-        
-        sheet = cssutils.parseString(style_sheet)
-        for rule in sheet:
-            if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
-                for property in rule.style:
-                    if property.name == 'src':
-                        woff = re.search(r'.*url\((.*woff)\)\.*', property.value)
-                        if woff:
-                            woff_ref = Utils.resolve_template_ref(woff.group(1), style_sheet_dir)
-                            ref_files.append(woff_ref)
-                        woff2 = re.search(r'.*url\((.*woff2)\)\.*', property.value)
-                        if woff2:
-                            woff2_ref = Utils.resolve_template_ref(woff2.group(1), style_sheet_dir)
-                            ref_files.append(woff2_ref)
-                        ttf = re.search(r'.*url\((.*ttf)\)\.*', property.value)
-                        if ttf:
-                            ttf_ref = Utils.resolve_template_ref(ttf.group(1), style_sheet_dir)
-                            ref_files.append(ttf_ref)
-                        otf = re.search(r'.*url\((.*otf)\)\.*', property.value)
-                        if otf:
-                            otf_ref = Utils.resolve_template_ref(otf.group(1), style_sheet_dir)
-                            ref_files.append(otf_ref)
-                        svg = re.search(r'.*url\((.*svg)\)\.*', property.value)
-                        if svg:
-                            svg_ref = Utils.resolve_template_ref(svg.group(1), style_sheet_dir)
-                            ref_files.append(svg_ref)
-                        eot = re.search(r'.*url\((.*eot)\)\.*', property.value)
-                        if eot:
-                            eot_ref = Utils.resolve_template_ref(eot.group(1), style_sheet_dir)
-                            ref_files.append(eot_ref)
-                       
+            Utils.add_font_ref(style.encode_contents(), template_file_dir, ref_files)
+                                    
         for script in html_soup.find_all('script'):
             ref = Utils.resolve_template_ref(script.get("src"), template_file_dir)
             if ref is not None:
-                ref_files.append(ref)
-
+                if minify_resources:
+                    ref_files.append(process_single_js_file(ref, overwrite=True))
+                else:
+                    ref_files.append(ref)
+                
         for img in html_soup.find_all('img'):
             ref = Utils.resolve_template_ref(img.get("src"), template_file_dir)
             if ref is not None:

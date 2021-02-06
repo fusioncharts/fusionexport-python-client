@@ -1,6 +1,6 @@
 import os
 import tempfile
-import json
+from css_html_js_minify import html_minify
 
 from .constants import Constants
 from .utils import Utils
@@ -94,12 +94,12 @@ class ExportConfig(object):
     def clone(self):
         return ExportConfig(self.__configs)
 
-    def get_formatted_configs(self):
-        configs = self.__process_config_values()
+    def get_formatted_configs(self, minify_resources=False):
+        configs = self.__process_config_values(minify_resources)
         configs.pop(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
         return configs
 
-    def __process_config_values(self):
+    def __process_config_values(self, minify_resources=False):
         configs = self.__configs.copy()
         zip_files_map = []
         
@@ -143,13 +143,17 @@ class ExportConfig(object):
             # If it is not a file but html content, then save the content to a temp file and set the path of that temp file
             if (fileContent.startswith("<")):
                 tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-                tmp.writelines(fileContent)
+                if minify_resources:
+                    tmp.writelines(html_minify(fileContent))
+                else:
+                    tmp.writelines(fileContent)
                 tmp.close();
                 configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH] = tmp.name
 
             template_zip_files_map, prefixed_template_zip_path = Utils.create_template_zip_paths(
                 configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH],
-                configs.get(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
+                configs.get(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None),
+                minify_resources
             )
             configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH] = prefixed_template_zip_path
             zip_files_map.extend(template_zip_files_map)

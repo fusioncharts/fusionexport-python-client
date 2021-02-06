@@ -21,7 +21,7 @@ setup(
         'fusionexport': 'fusionexport'
     },
     install_requires=[
-		'requests', 'glob2', 'beautifulsoup4'
+		'requests', 'glob2', 'beautifulsoup4', 'css-html-js-minify', 'cssutils'
     ],
     keywords='fusionexport fusioncharts sdk charts export python dashboards language client cli console',
 )
