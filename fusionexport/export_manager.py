@@ -43,8 +43,9 @@ class ExportManager(object):
             files.append(encoded_string)
         return files
 
-    def __exportCore(self, export_config):
+    def __exportCore(self, export_config,exportBulk):
         configs = export_config.get_formatted_configs()
+        configs['exportBulk'] = self.exportBulkParameterHandler(exportBulk)
         payloadData = {}
         zip_file_path = None
         zip_file_fd = None
@@ -77,8 +78,20 @@ class ExportManager(object):
         except (requests.ConnectionError, requests.ConnectTimeout):
             raise ExportError("Connection Refused: Unable to connect to FusionExport server. Make sure that your server is running on %s:%s" % (self.__host, self.__port))
     
+
+    def exportBulkParameterHandler(self, exportBulk):
+        if exportBulk =='true' or exportBulk=='True':
+            return 'true'
+        elif exportBulk =='false' or exportBulk =='False':
+            return 'false'
+        elif exportBulk == '0' or exportBulk ==0:
+            return 'false'
+        elif exportBulk =='1' or exportBulk ==1:
+            return "true"
+
+
     # Returns the exported data as bytes 
-    def exportAsStream(self, export_config, unzip=False):
+    def exportAsStream(self, export_config, unzip=True):
         
         buff = self.__exportCore(export_config)
         
@@ -98,9 +111,9 @@ class ExportManager(object):
         return files
         
 
-    def export(self, export_config, output_dir='.', unzip=False):
+    def export(self, export_config, output_dir='.', unzip=True,exportBulk='false'):
 
-        buff = self.__exportCore(export_config)
+        buff = self.__exportCore(export_config,exportBulk)
 
         zip_file_path = None
 
