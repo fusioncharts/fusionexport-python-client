@@ -7,9 +7,9 @@ import tempfile
 import shutil
 import re
 import cssutils
-from css_html_js_minify import process_single_html_file, process_single_js_file, process_single_css_file
-
+from jsmin import jsmin
 from bs4 import BeautifulSoup
+from html_minifier.minify import Minifier
 
 from .constants import Constants
 from .export_error import ExportError
@@ -28,10 +28,9 @@ class Utils(object):
             return None
 
     @staticmethod
-    def create_template_zip_paths(template_file_path, resource_file_path, minify_resources=False):
+    def create_template_zip_paths(template_file_path, resource_file_path):
         template_file_path = os.path.abspath(template_file_path)
-        
-        ref_files = Utils.extract_ref_files_from_template(template_file_path, minify_resources)
+        ref_files = Utils.extract_ref_files_from_template(template_file_path)
         base_path, res_paths = Utils.normalize_resource_file_paths(resource_file_path)
         if base_path is None:
             base_path = Utils.get_common_path([template_file_path] + ref_files)
@@ -66,19 +65,33 @@ class Utils(object):
         return os.path.join(Constants.TEMPLATE_ZIP_PREFIX, rel_path)
     
     @staticmethod
-    def generate_zip_file(zip_files_map):
+    def generate_zip_file(zip_files_map, minify_resources=False):
         temp_dir = tempfile.mkdtemp()
         temp_write_dir = os.path.abspath(os.path.join(temp_dir, "files"))
         os.makedirs(temp_write_dir)
 
         for path_map in zip_files_map:
             rel_path = path_map["zipPath"]
+            local_path = path_map["localPath"]
+            print(local_path, rel_path)
             if rel_path is not None:
                 rel_path = rel_path.strip(os.sep)
                 temp_output_file_path = os.path.abspath(os.path.join(temp_write_dir, rel_path))
+                print(rel_path, temp_output_file_path)
                 if not os.path.exists(os.path.dirname(temp_output_file_path)):
                     os.makedirs(os.path.dirname(temp_output_file_path))
-                shutil.copyfile(path_map["localPath"], temp_output_file_path)
+                if minify_resources:
+                    r_file = open(local_path, 'r'); w_file = open(temp_output_file_path, 'w')
+                    if local_path.endswith('.js'):
+                        w_file.write(jsmin(r_file.read(), quote_chars="'\"`"))
+                    elif local_path.endswith('.html') or local_path.endswith('.css'):
+                        html_content = Minifier(r_file.read())
+                        w_file.write(html_content.minify())
+                    else:
+                        shutil.copyfileobj(r_file, w_file)
+                    r_file.close();w_file.close()
+                else:
+                    shutil.copyfile(path_map["localPath"], temp_output_file_path)
 
         return shutil.make_archive(os.path.abspath(os.path.join(temp_dir, "archive")), 'zip', temp_write_dir)
     
@@ -98,6 +111,7 @@ class Utils(object):
     
     @staticmethod
     def add_font_ref(content, file_dir, ref_files):
+        return
         sheet = cssutils.parseString(content)
         for rule in sheet:
             if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
@@ -107,9 +121,9 @@ class Utils(object):
                         if font_re:
                             font_ref = Utils.resolve_template_ref(font_re.group(1), file_dir)
                             ref_files.append(font_ref)
-
+        
     @staticmethod
-    def extract_ref_files_from_template(template_file_path, minify_resources=False):
+    def extract_ref_files_from_template(template_file_path):
         if template_file_path is None:
             return []
 
@@ -122,16 +136,10 @@ class Utils(object):
         for link in html_soup.find_all('link'):
             ref = Utils.resolve_template_ref(link.get("href"), template_file_dir)
             if ref is not None:
+                ref_files.append(ref)
                 is_html = True
                 if ref.endswith('.css'):
                     is_html = False
-                if minify_resources:
-                    if is_html:
-                        ref_files.append(process_single_html_file(ref, overwrite=True))
-                    else:
-                        ref_files.append(process_single_css_file(ref, overwrite=True))
-                else:
-                    ref_files.append(ref)
                 file_dir = os.path.dirname(ref)
                 ref_file_content = Utils.read_text_file(ref)
                 if is_html:
@@ -150,10 +158,7 @@ class Utils(object):
         for script in html_soup.find_all('script'):
             ref = Utils.resolve_template_ref(script.get("src"), template_file_dir)
             if ref is not None:
-                if minify_resources:
-                    ref_files.append(process_single_js_file(ref, overwrite=True))
-                else:
-                    ref_files.append(ref)
+                ref_files.append(ref)
                 
         for img in html_soup.find_all('img'):
             ref = Utils.resolve_template_ref(img.get("src"), template_file_dir)

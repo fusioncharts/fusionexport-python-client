@@ -142,10 +142,11 @@ class ExportManager(object):
             export_files.extend(list(filter(lambda entry: not entry.endswith("/"), zip_ref.namelist())))
             zip_ref.close()
         else:
-            print(buff, output_dir)
-            shutil.copyfileobj(buff, os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)))
+            zip_file = open(os.path.abspath(os.path.join(output_dir, Constants.EXPORT_ZIP_FILE_NAME)), 'wb')
+            shutil.copyfileobj(buff, zip_file)
             export_files.append(Constants.EXPORT_ZIP_FILE_NAME)
             buff.close()
+            zip_file.close()
 
         if zip_file_path is not None:
             shutil.rmtree(os.path.dirname(zip_file_path))
