@@ -4,8 +4,9 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["templateFilePath"] = "template_d3.html"
-export_config["type"] = "png"
+export_config["templateFilePath"] = "resources/template_d3.html"
+export_config["type"] = "pdf"
+export_config["templateFormat"] = "A3"
 export_config["asyncCapture"] = "true"
 
 # Provide port and host of FusionExport Service

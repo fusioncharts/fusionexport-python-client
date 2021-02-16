@@ -5,7 +5,7 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
 
-export_config["chartConfig"] = "multiple.json"
+export_config["chartConfig"] = "resources/multiple.json"
 export_config["outputFile"] = "export-<%= number(5) %>"
 export_config["type"] = "pdf"
 export_config["templateFormat"] = "A4"
