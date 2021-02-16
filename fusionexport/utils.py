@@ -6,7 +6,6 @@ import glob2
 import tempfile
 import shutil
 import re
-import cssutils
 from jsmin import jsmin
 from bs4 import BeautifulSoup
 from html_minifier.minify import Minifier
@@ -73,11 +72,9 @@ class Utils(object):
         for path_map in zip_files_map:
             rel_path = path_map["zipPath"]
             local_path = path_map["localPath"]
-            print(local_path, rel_path)
             if rel_path is not None:
                 rel_path = rel_path.strip(os.sep)
                 temp_output_file_path = os.path.abspath(os.path.join(temp_write_dir, rel_path))
-                print(rel_path, temp_output_file_path)
                 if not os.path.exists(os.path.dirname(temp_output_file_path)):
                     os.makedirs(os.path.dirname(temp_output_file_path))
                 if minify_resources:
@@ -111,16 +108,23 @@ class Utils(object):
     
     @staticmethod
     def add_font_ref(content, file_dir, ref_files):
-        return
-        sheet = cssutils.parseString(content)
-        for rule in sheet:
-            if rule.type == cssutils.css.CSSFontFaceRule.FONT_FACE_RULE:
-                for property in rule.style:
-                    if property.name == 'src':
-                        font_re = re.search(r'.*url\((.*(woff|woff2|ttf|otf|svg|eot))\)\.*', property.value)
-                        if font_re:
-                            font_ref = Utils.resolve_template_ref(font_re.group(1), file_dir)
-                            ref_files.append(font_ref)
+        allowed_ext = ['.ttf','.otf','.woff','.woff2','.eot','.svg']
+        matches = re.finditer('url\((.*?)\)', content)
+        for match in matches:
+            for groupNum in range(0, len(match.groups())):
+                groupNum = groupNum + 1
+                extracted_path = match.group(groupNum)
+                if extracted_path != "":
+                    if extracted_path[0] in ["'",'"']:
+                        eval_path = eval(extracted_path)
+                    else:
+                        eval_path = extracted_path
+                    splt_path = os.path.splitext(eval_path)
+                    if len(splt_path) > 1:
+                        path_ext = splt_path[1]
+                        if path_ext in allowed_ext:
+                            resolved_path = Utils.resolve_template_ref(eval_path, file_dir)
+                            ref_files.append(resolved_path)
         
     @staticmethod
     def extract_ref_files_from_template(template_file_path):
@@ -153,7 +157,7 @@ class Utils(object):
         styles = html_soup.findAll('style')
     
         for style in styles:
-            Utils.add_font_ref(style.encode_contents(), template_file_dir, ref_files)
+            Utils.add_font_ref(style.string, template_file_dir, ref_files)
                                     
         for script in html_soup.find_all('script'):
             ref = Utils.resolve_template_ref(script.get("src"), template_file_dir)
