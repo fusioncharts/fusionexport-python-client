@@ -56,6 +56,14 @@ typings = {
         "supportedTypes": ["string", "boolean"],
         "converter": "BooleanConverter"
     },
+    "header": {
+        "type": "string",
+        "supportedTypes": ["string"],
+    },
+    "subheader": {
+        "type": "string",
+        "supportedTypes": ["string"],
+    },
     "maxWaitForCaptureExit": {
         "type": "integer",
         "supportedTypes": ["string", "integer"],
