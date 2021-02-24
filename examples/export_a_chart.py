@@ -29,7 +29,7 @@ export_config["chartConfig"] = [{
         ]
     }
 }]
-
+export_config["type"] = "png"
 # Instantiate the ExportManager class
 em = ExportManager()
 
