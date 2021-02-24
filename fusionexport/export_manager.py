@@ -111,7 +111,7 @@ class ExportManager(object):
         return files
         
 
-    def export(self, export_config, output_dir='.', unzip=True,exportBulk='false'):
+    def export(self, export_config, output_dir='.', unzip=True,exportBulk='true'):
 
         buff = self.__exportCore(export_config,exportBulk)
 
