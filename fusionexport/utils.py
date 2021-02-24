@@ -85,7 +85,7 @@ class Utils(object):
                         html_content = Minifier(r_file.read())
                         w_file.write(html_content.minify())
                     else:
-                        shutil.copyfileobj(r_file, w_file)
+                        shutil.copyfile(local_path, temp_output_file_path)
                     r_file.close();w_file.close()
                 else:
                     shutil.copyfile(path_map["localPath"], temp_output_file_path)
