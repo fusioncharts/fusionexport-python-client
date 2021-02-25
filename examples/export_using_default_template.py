@@ -53,14 +53,13 @@ export_config["chartConfig"] = [{
 }]
 
 export_config["type"] = 'png'
-export_config["exportBulk"] = 'true'
 export_config["header"] = "FusionCharts"
 export_config["subheader"] = "FusionChartsExport"
 # Instantiate the ExportManager class
 em = ExportManager()
 
 # Call the export() method with the export config and the output location
-exported_files = em.export(export_config, "./exported-charts", True,"true")
+exported_files = em.export(export_config, "./exported-charts", True, False)
 
 # print list of exported files
 print(exported_files)

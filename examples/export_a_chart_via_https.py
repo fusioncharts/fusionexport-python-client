@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 from fusionexport import ExportManager, ExportConfig  # Import sdk
+
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
@@ -28,12 +30,11 @@ export_config["chartConfig"] = [{
     }
 }]
 
-export_config["type"] = 'xlsx'
 # Instantiate the ExportManager class
-em = ExportManager()
+em = ExportManager(is_secure=True)
 
 # Call the export() method with the export config and the output location
-exported_files = em.export(export_config, "./exported-charts", True)
+exported_files = em.export(export_config, "./exports", True)
 
 # print list of exported files
 print(exported_files)
