@@ -67,8 +67,8 @@ class ExportManager(object):
             files.append(encoded_string)
         return files
 
-    def __exportCore(self, export_config):
-        configs = export_config.get_formatted_configs(self.__minify_resources)
+    def __exportCore(self, export_config, export_bulk=True):
+        configs = export_config.get_formatted_configs(self.__minify_resources, export_bulk)
         payloadData = {}
         zip_file_path = None
         zip_file_fd = None
@@ -103,9 +103,9 @@ class ExportManager(object):
     
 
     # Returns the exported data as bytes 
-    def exportAsStream(self, export_config, unzip=True):
+    def exportAsStream(self, export_config, unzip=True, export_bulk=True):
         
-        buff = self.__exportCore(export_config)
+        buff = self.__exportCore(export_config, export_bulk)
         
         files = {}
 
@@ -123,9 +123,9 @@ class ExportManager(object):
         return files
         
 
-    def export(self, export_config, output_dir='.', unzip=True):
+    def export(self, export_config, output_dir='.', unzip=True, export_bulk=True):
 
-        buff = self.__exportCore(export_config)
+        buff = self.__exportCore(export_config, export_bulk)
 
         zip_file_path = None
 

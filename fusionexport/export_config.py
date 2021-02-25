@@ -101,18 +101,20 @@ class ExportConfig(object):
     def clone(self):
         return ExportConfig(self.__configs)
 
-    def get_formatted_configs(self, minify_resources=False):
+    def get_formatted_configs(self, minify_resources=False, export_bulk=True):
         if minify_resources:
             self.resolve_minify_configs()
-        configs = self.__process_config_values(minify_resources)
+        configs = self.__process_config_values(minify_resources, export_bulk)
         configs.pop(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
         return configs
 
-    def __process_config_values(self, minify_resources=False):
+    def __process_config_values(self, minify_resources=False, export_bulk=True):
         configs = self.__configs.copy()
         zip_files_map = []
         
         configs["clientName"] = "Python"
+        if not export_bulk:
+            configs["exportBulk"] = ""
 
         if Constants.EXPORT_CONFIG_NAME_INPUTSVG in configs:
             self.__resolve_zip_path_config(
