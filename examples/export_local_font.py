@@ -2,7 +2,7 @@ from fusionexport import ExportManager, ExportConfig
 
 export_config = ExportConfig()
 export_config["chartConfig"] = "resources/chartconfig_file.json"
-export_config["templateFilePath"] = "./resources/dashboardtemplate.html"
+export_config["templateFilePath"] = "resources/dashboardtemplate.html"
 export_config["type"] = "png"
 
 export_server_host = "127.0.0.1"

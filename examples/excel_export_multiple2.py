@@ -2,7 +2,7 @@ from fusionexport import ExportManager, ExportConfig  # Import sdk
 
 # Instantiate the ExportConfig class and add the required configurations
 export_config = ExportConfig()
-export_config["chartConfig"] = "./resources/multiple.json"
+export_config["chartConfig"] = "resources/multiple.json"
 export_config["type"] = 'xlsx'
 # Instantiate the ExportManager class
 em = ExportManager()
