@@ -1,9 +1,9 @@
 import os.path
 import json
-
 from .export_error import ExportError
 from .utils import Utils
-
+from jsmin import jsmin
+from html_minifier.minify import Minifier
 class BooleanConverter(object):
     @staticmethod
     def convert(value, config_name):
@@ -25,19 +25,29 @@ class NumberConverter(object):
 
 class ChartConfigConverter(object):
     @staticmethod
-    def convert(value):
+    def convert(value, minify_resources=False):
         if (type(value) == type({}) or type(value) == type([])):
-            value = json.dumps(value)
+            if minify_resources:
+                value = json.dumps(value, indent=None)
+            else:
+                value = json.dumps(value)
         valueToLower = str(value).lower()
         if valueToLower.endswith(".json"):
             if os.path.isfile(value) == False :
                 print(os.path.isfile(value))
                 raise ExportError("chartConfig [URL] not found. Please provide an appropriate path")
-            return Utils.read_text_file(value)
+            json_value = Utils.read_text_file(value)
+            if minify_resources:
+                return jsmin(json_value)
+            else:
+                return json_value
         else:
             try:
                 json.loads(value)
-                return value
+                if minify_resources:
+                    return jsmin(value)
+                else:
+                    return value
             except Exception:
                 raise ExportError(("chartConfig of type '%s' is unsupported. Supported data types are string, object,array & file path." % type(value).__name__))
 
@@ -61,17 +71,24 @@ class FileConverter(object):
 
 class HtmlConverter(object):
     @staticmethod
-    def convert(value, config_name):
+    def convert(value, config_name, minify_resources=False):
         if (type(value) == type("")):
             if value.startswith("<") == False or value.lower().endswith("</html>") == False :
                 raise ExportError(config_name + ": String should be a valid HTML template")
-            return value
+            if minify_resources:
+                html_content = Minifier(value)
+                return html_content.minify()
+            else:
+                return value
         else:
             raise ExportError("'%s' of type '%s' is unsupported. Supported data types is string" % (config_name, type(value).__name__))
 
 class ObjectConverter(object):
     @staticmethod
-    def convert(value, config_name):
+    def convert(value, config_name, minify_resources=False):
         if(type(value) == type({})):
-            value = json.dumps(value)
+            if minify_resources:
+                value = json.dumps(value, indent=None)
+            else:
+                value = json.dumps(value)
             return value

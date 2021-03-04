@@ -29,9 +29,9 @@ export_config["chartConfig"] = [{
         ]
     }
 }]
-export_config["type"] = "png"
+
 # Instantiate the ExportManager class
-em = ExportManager()
+em = ExportManager(is_secure=True)
 
 # Call the export() method with the export config and the output location
 exported_files = em.export(export_config, "./exports", True)

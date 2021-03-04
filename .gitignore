@@ -102,3 +102,4 @@ examples/exports/
 
 test_*.*
 export*.*
+!export*.py
