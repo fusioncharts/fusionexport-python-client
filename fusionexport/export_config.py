@@ -1,6 +1,6 @@
 import os
 import tempfile
-import json
+from html_minifier.minify import Minifier
 
 from .constants import Constants
 from .utils import Utils
@@ -11,7 +11,7 @@ from .converters import BooleanConverter, NumberConverter, ChartConfigConverter,
 class ExportConfig(object):
     def __init__(self, config_dict=None):
         self.__configs = {}
-
+        self.__passed_configs = {}
         if config_dict is not None:
             for config_name, config_value in config_dict.items():
                 self.set(config_name, config_value)
@@ -23,14 +23,21 @@ class ExportConfig(object):
         return self.get(key)
 
     def set(self, config_name, config_value):
+        self.__passed_configs[config_name] = config_value 
         self.__configs[config_name] = self.__resolve_config_value(config_name, config_value)
+    
+    def resolve_minify_configs(self):
+        passed_configs = self.__passed_configs.copy()
+        for config_name, config_value in passed_configs.items():
+            self.__configs[config_name] = self.__resolve_config_value(config_name, config_value, True)
+            self.__passed_configs.pop(config_name, None)
 
-    def __resolve_config_value(self, config_name, config_value):
+    def __resolve_config_value(self, config_name, config_value, minify_resources=False):
         if config_name not in typings:
             raise ExportError("Invalid export config: %s" % config_name)
 
-        if config_name == "template" or config_name == "templateFilePath":
-            if "templateFilePath" in self.__configs or "template" in self.__configs:
+        if (config_name == "template" and "templateFilePath" in self.__configs) or (config_name == "templateFilePath" and "template" in self.__configs):
+            if not minify_resources:
                 print("Both 'templateFilePath' and 'template' is provided. 'templateFilePath' will be ignored.");
 
         converter = typings[config_name].get("converter", None)
@@ -40,16 +47,16 @@ class ExportConfig(object):
             elif converter == "NumberConverter":
                 return NumberConverter.convert(config_value, config_name)
             elif converter == "ChartConfigConverter":
-                return ChartConfigConverter.convert(config_value)
+                return ChartConfigConverter.convert(config_value, minify_resources)
             elif converter == "EnumConverter":
                 dataset = typings[config_name].get("dataset")
                 return EnumConverter.convert(config_value, dataset, config_name)
             elif converter == "FileConverter":
                 return FileConverter.convert(config_value, config_name)
             elif converter == "HtmlConverter":
-                return HtmlConverter.convert(config_value, config_name)
+                return HtmlConverter.convert(config_value, config_name, minify_resources)
             elif converter == "ObjectConverter":
-                return ObjectConverter.convert(config_value, config_name)
+                return ObjectConverter.convert(config_value, config_name, minify_resources)
             else:
                 raise ExportError("Unknown converter: %s" % converter)
         elif typings[config_name]["type"] == "string":
@@ -94,16 +101,20 @@ class ExportConfig(object):
     def clone(self):
         return ExportConfig(self.__configs)
 
-    def get_formatted_configs(self):
-        configs = self.__process_config_values()
+    def get_formatted_configs(self, minify_resources=False, export_bulk=True):
+        if minify_resources:
+            self.resolve_minify_configs()
+        configs = self.__process_config_values(minify_resources, export_bulk)
         configs.pop(Constants.EXPORT_CONFIG_NAME_RESOURCE_FILE_PATH, None)
         return configs
 
-    def __process_config_values(self):
+    def __process_config_values(self, minify_resources=False, export_bulk=True):
         configs = self.__configs.copy()
         zip_files_map = []
         
         configs["clientName"] = "Python"
+        if not export_bulk:
+            configs["exportBulk"] = ""
 
         if Constants.EXPORT_CONFIG_NAME_INPUTSVG in configs:
             self.__resolve_zip_path_config(
@@ -143,7 +154,11 @@ class ExportConfig(object):
             # If it is not a file but html content, then save the content to a temp file and set the path of that temp file
             if (fileContent.startswith("<")):
                 tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
-                tmp.writelines(fileContent)
+                if minify_resources:
+                    html_content = Minifier(fileContent)
+                    tmp.writelines(html_content.minify())
+                else:
+                    tmp.writelines(fileContent)
                 tmp.close();
                 configs[Constants.EXPORT_CONFIG_NAME_TEMPLATE_FILE_PATH] = tmp.name
 
@@ -159,7 +174,7 @@ class ExportConfig(object):
             configs[Constants.EXPORT_CONFIG_NAME_ASYNC_CAPTURE] = str(bool_val).lower()
 
         if len(zip_files_map) > 0:
-            zip_file_path = Utils.generate_zip_file(zip_files_map)
+            zip_file_path = Utils.generate_zip_file(zip_files_map, minify_resources)
             configs[Constants.EXPORT_CONFIG_NAME_PAYLOAD] = zip_file_path
         
         return configs
